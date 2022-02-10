@@ -23,3 +23,7 @@ If you then activate your virtual environment and navigate to your newly created
 
 		jupyter notebook
 Which will launch an interactive browser window. You can then open the tutorial notebook. 
+
+# Documentation 
+
+Package documentation is contained at the following link: https://kyleyoung1997.github.io/pyISARICBasics/
