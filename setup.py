@@ -39,7 +39,7 @@ setup(
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
     ### TODO change this
-    url='https://github.com/placeholder',  # Optional
+    url='https://github.com/KyleYoung1997/pyIsaricBasics',  # Optional
 
     # This should be your name or the name of the organization which owns the
     # project.
@@ -60,7 +60,7 @@ setup(
         'Development Status :: 3 - Alpha',
 
         # Indicate who your project is intended for
-        'Intended Audience :: ISARIC Researchers',
+        'Intended Audience :: Developers',
 
         # Pick your license as you wish
         'License :: OSI Approved :: MIT License',
@@ -68,9 +68,6 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate you support Python 3. These classifiers are *not*
         # checked by 'pip install'. See instead 'python_requires' below.
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         "Programming Language :: Python :: 3.10",
@@ -112,7 +109,7 @@ setup(
     #
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/discussions/install-requires-vs-requirements/
-    install_requires=['peppercorn', 'pandas', 'numpy'],  # Optional
+    install_requires=['jupyter', 'pandas', 'numpy'],  # Optional
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
@@ -122,10 +119,10 @@ setup(
     #
     # Similar to `install_requires` above, these must be valid existing
     # projects.
-    extras_require={  # Optional
-        'dev': ['check-manifest'],
-        'test': ['coverage'],
-    },
+    # extras_require={  # Optional
+    #     'dev': ['check-manifest'],
+    #     'test': ['coverage'],
+    # },
 
     # If there are data files included in your packages that need to be
     # installed, specify them here.
@@ -148,11 +145,11 @@ setup(
     # For example, the following would provide a command called `sample` which
     # executes the function `main` from this package when invoked:
     # TODO change this to generate databasse
-    entry_points={  # Optional
-        'console_scripts': [
-            'sample=sample:main',
-        ],
-    },
+    # entry_points={  # Optional
+    #     'console_scripts': [
+    #         'sample=sample:main',
+    #     ],
+    # },
 
     # List additional URLs that are relevant to your project as a dict.
     #
@@ -165,8 +162,7 @@ setup(
     # what's used to render the link text on PyPI.
     #TODO update these
     project_urls={  # Optional
-        'Bug Reports': 'https://github.com/placeholder',
-        'ISARIC': 'holder',
-        'Source': 'https://github.com/pypa/placeholder/',
+        'Bug Reports': 'https://github.com/KyleYoung1997/pyIsaricBasics/issues',
+        'Source': 'https://github.com/KyleYoung1997/pyIsaricBasics',
     },
 )

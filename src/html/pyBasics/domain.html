@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.9.2" />
+<title>pyBasics.domain API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>pyBasics.domain</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import gc
+import os
+import sqlite3
+
+import numpy as np
+import pandas as pd
+from . import functions
+
+# pd.set_option(&#39;display.max_rows&#39;, None)
+pd.set_option(&#39;display.max_columns&#39;, None)
+# pd.set_option(&#39;display.max_rows&#39;, None)
+pd.set_option(&#39;display.expand_frame_repr&#39;, False)
+
+
+class Domain:
+    &#34;&#34;&#34;
+    A generic class that loads a domain and provides basic exploratory data analysis
+    &#34;&#34;&#34;
+
+    def __init__(self, domain: str, data_directory: str, num_rows = -1):
+
+        # Load domain as a dataframe and store as a class field
+        self.frame = self.read_domain(domain, data_directory, num_rows)
+        &#34;&#34;&#34;
+        A Pandas DataFrame which is the data structure where we store the information about this domain. 
+        &#34;&#34;&#34;
+        # Store the name of domain as a class field
+        self.domain = domain
+        &#34;&#34;&#34;
+        A string that contains the name of the domain that we have currently loaded. 
+        &#34;&#34;&#34;
+
+        # We handle term based domains slightly different
+        if domain in [&#39;HO&#39;, &#39;SA&#39;, &#39;IN&#39;]:
+            # Save term based domain information as a protected attribute - we use this behind the scenes
+            self.__is_term_outcome = True
+            # Process outcome column - this is appended to the end of our class specific frame object
+            self.__process_occur()
+        else:
+            self.__is_term_outcome = False
+
+    @staticmethod
+    def __read_domain_deprecated(domain, data_folder, data_file):
+        &#34;&#34;&#34;
+
+        :param domain: Domain to load e.g. DM, SA, IN
+        :param data_folder: Directory where database is located
+        :param data_file: Filename of sqlite database
+        :return: dataframe that contains the whole domain
+        &#34;&#34;&#34;
+
+        try:
+            db_file = os.path.join(data_folder, data_file)
+            con = f&#39;sqlite:///{db_file}&#39;
+            # con = sqlite3.connect(db_file)
+            # df = pd.read_sql_table(domain, uri)
+            if domain == &#34;SA&#34;:
+                columns = &#34;STUDYID, USUBJID, SASEQ, SADY, SATERM, SAMODIFY, SACAT, SAPRESP, SAOCCUR&#34;
+            elif domain == &#34;IN&#34;:
+                columns = &#34;USUBJID, INSEQ, INDY, INSTDY, INTRT, INMODIFY, INCAT, INPRESP, INOCCUR, INREFID&#34;
+                # columns = &#34;*&#34;
+            else:
+                columns = &#34;*&#34;
+            df = pd.read_sql(&#34;SELECT {} FROM &#39;{}&#39;&#34;.format(columns, domain), con)
+            df = df.rename(columns=lambda x: x.strip())
+            return df
+
+        except Exception as e2:
+            print(&#34;Domain could not be loaded from sqlite database&#34;, e2)
+            return
+        finally:
+            print(&#34;Domain {} Loaded&#34;.format(domain))
+            # con.close()
+            gc.collect()
+
+    @staticmethod
+    def read_domain(domain: str, data_folder: str, num_rows: int) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+        Loads a domain from auxiliary generated pickle files for faster Python I/O than with SQL table reads
+
+        :param num_rows: Integer (optional): Number of rows to load from dataframe (default loads all)
+
+        :param domain: String name of domain
+
+        :param data_folder: String, Path to folder containing .pickle files
+
+        :return: pd.DataFrame containing the full domain (all columns and rows)
+        &#34;&#34;&#34;
+        db_file = os.path.join(data_folder, domain)
+        df = pd.read_pickle(f&#34;{db_file}.pickle&#34;)
+
+        if num_rows == -1:
+            return df
+        else:
+            return df[:num_rows]
+
+    def columns(self):
+        &#34;&#34;&#34;
+
+        :return: prints list of columns contained in self.frame
+        &#34;&#34;&#34;
+        print(self.frame.columns.to_list())
+
+    def exclude_columns(self, columns: list):
+        &#34;&#34;&#34;
+        Excludes some columns from the class variable &#39;frame&#39;
+
+        :param columns: Columns to drop from domain
+
+        :return: None (operates on class variable)
+        &#34;&#34;&#34;
+        try:
+            self.frame.drop(labels=columns, axis=1, inplace=True)
+        except KeyError:
+            print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))
+
+    def include_columns(self, columns: list):
+        &#34;&#34;&#34;
+
+        :param columns: (list) Columns to include in dataframe.
+        :return: None (operates on class variable)
+        &#34;&#34;&#34;
+        try:
+            self.frame = self.frame[columns]
+        except KeyError:
+            print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))
+
+    def column_events(self, column: str):
+        try:
+            print(self.frame[column].unique())
+        except KeyError:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def select_variable_from_column(self, column: str, variable: str) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+        Filters and returns a dataframe based off column and variable information, Returns an error if column is not
+        found within the current domain.
+
+        :param variable: String containing variable to be selected from column
+
+        :param column: String containing the column within self.frame to selct variable from
+
+        :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
+        &#34;&#34;&#34;
+        try:
+            df = self.frame[self.frame[column] == variable]
+            if len(df) == 0:
+                print(f&#34;There were no occurences of {variable} within {column}&#34;)
+            return df
+        except KeyError as e:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def table_missingness(self, column=None, variable=None):
+        &#34;&#34;&#34;
+        Print&#39;s a missingness table for either a whole table, or a filtered table where we have selected
+        frame.column == variable
+
+        :param column: (optional) column to search for term variable
+
+        :param variable: (optional) variable to search for
+
+        :return: None
+        &#34;&#34;&#34;
+        if variable is None and column is None:
+            print(f&#34;Total number of rows {len(self.frame)}&#34;)
+            print(self.frame.isna().sum())
+        elif column is None or variable is None:
+            print(&#34;Must specify both a column and a variable&#34;)
+        else:
+            try:
+                trimmed = self.frame[self.frame[column] == variable]
+                print(print(f&#34;Total number of rows {len(trimmed)}&#34;))
+                print(trimmed.isna().sum())
+            except KeyError as e:
+                print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def column_summary(self, column: str, proportions=False, status=False):
+        &#34;&#34;&#34;
+
+        :param column: String, Column name
+
+        :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
+        counts of events in column.
+
+        :return:
+        &#34;&#34;&#34;
+        try:
+            # Loads column as pd.Series
+            filtered = self.frame[column]
+            if status:
+                with pd.option_context(&#39;display.max_rows&#39;, None):
+                    print((self.frame[column] + &#34;__&#34; + self.frame[&#39;status&#39;]).value_counts(normalize=False).sort_index())
+            else:
+                with pd.option_context(&#39;display.max_rows&#39;, None):
+                    print(filtered.value_counts(normalize=proportions))
+        except KeyError as e:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def __process_occur(self):
+        &#34;&#34;&#34;
+        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe
+
+        :return: None
+        &#34;&#34;&#34;
+
+        if not self.__is_term_outcome:
+            pass
+        else:
+            occur = f&#34;{self.domain}OCCUR&#34;
+            presp = f&#34;{self.domain}PRESP&#34;
+            yes_maps = (self.frame[occur] == &#39;Y&#39;)
+
+            no_maps = self.frame[occur] == &#39;N&#39;
+            yes_maps = (self.frame[occur].isna() &amp; self.frame[presp].isna()) | (self.frame[presp] != &#39;Y&#39;) | (yes_maps)
+            unknown_maps = (self.frame[occur].isna() &amp; (self.frame[presp] == &#34;Y&#34;)) | (self.frame[occur] == &#39;U&#39;)
+
+            conds = [yes_maps, no_maps, unknown_maps]
+            choices = [&#34;Y&#34;, &#34;N&#34;, &#34;U&#34;]
+
+            self.frame[&#34;status&#34;] = np.select(conds, choices, None)
+
+    def free_text_search(self, *term: str) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+        Searches for free text entries and returns a filtered dataframe with rows where there is a free text match
+
+        :param term: A string search term or (list). We search for any occurences of this substring e.g. term &#39;hospital&#39; would
+        also return rows with a free text entry matching &#39;hospitalization&#39;. This function is NOT case sensitive
+
+        :return: A filtered df with rows containing &#39;term&#39; in the relevant column of the original domain
+        &#34;&#34;&#34;
+
+        if self.domain not in [&#39;SA&#39;, &#39;IN&#39;, &#39;HO&#39;, &#39;LB&#39;]:
+            print(&#34;Free text search is currently only implemented for SA, IN, or HO domains&#34;)
+            print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
+            return
+
+        domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;:&#34;LBTEST&#34;}
+        search_col = domain_free_text[self.domain]
+        try:
+            search_col_mask = self.frame[search_col].str.contains(&#39;|&#39;.join(term), case=False, na=False)
+            filtered_frame = self.frame[search_col_mask]
+            readable_terms = &#34; or &#34;.join(term)
+            print(f&#34;Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows&#34;)
+        except TypeError:
+            print(&#34;This function requires the &#39;term&#39; argument to be a string&#34;)
+            filtered_frame = None
+        # we probably only want to return some filtered columns here (e.g. derived term, dy, seq, outcoke
+
+        return filtered_frame
+
+    def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
+        &#34;&#34;&#34;
+
+        :param name: (string) Name of domain we are overwriting / saving
+
+        :param data_directory: (string) path to data directory
+
+        :param database_file: (string) name of database file
+
+        :return: True, if write successful
+
+        &#34;&#34;&#34;
+        functions.df_to_sqlite(self.frame, name, data_directory, database_file)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="pyBasics.domain.Domain"><code class="flex name class">
+<span>class <span class="ident">Domain</span></span>
+<span>(</span><span>domain: str, data_directory: str, num_rows=-1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A generic class that loads a domain and provides basic exploratory data analysis</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Domain:
+    &#34;&#34;&#34;
+    A generic class that loads a domain and provides basic exploratory data analysis
+    &#34;&#34;&#34;
+
+    def __init__(self, domain: str, data_directory: str, num_rows = -1):
+
+        # Load domain as a dataframe and store as a class field
+        self.frame = self.read_domain(domain, data_directory, num_rows)
+        &#34;&#34;&#34;
+        A Pandas DataFrame which is the data structure where we store the information about this domain. 
+        &#34;&#34;&#34;
+        # Store the name of domain as a class field
+        self.domain = domain
+        &#34;&#34;&#34;
+        A string that contains the name of the domain that we have currently loaded. 
+        &#34;&#34;&#34;
+
+        # We handle term based domains slightly different
+        if domain in [&#39;HO&#39;, &#39;SA&#39;, &#39;IN&#39;]:
+            # Save term based domain information as a protected attribute - we use this behind the scenes
+            self.__is_term_outcome = True
+            # Process outcome column - this is appended to the end of our class specific frame object
+            self.__process_occur()
+        else:
+            self.__is_term_outcome = False
+
+    @staticmethod
+    def __read_domain_deprecated(domain, data_folder, data_file):
+        &#34;&#34;&#34;
+
+        :param domain: Domain to load e.g. DM, SA, IN
+        :param data_folder: Directory where database is located
+        :param data_file: Filename of sqlite database
+        :return: dataframe that contains the whole domain
+        &#34;&#34;&#34;
+
+        try:
+            db_file = os.path.join(data_folder, data_file)
+            con = f&#39;sqlite:///{db_file}&#39;
+            # con = sqlite3.connect(db_file)
+            # df = pd.read_sql_table(domain, uri)
+            if domain == &#34;SA&#34;:
+                columns = &#34;STUDYID, USUBJID, SASEQ, SADY, SATERM, SAMODIFY, SACAT, SAPRESP, SAOCCUR&#34;
+            elif domain == &#34;IN&#34;:
+                columns = &#34;USUBJID, INSEQ, INDY, INSTDY, INTRT, INMODIFY, INCAT, INPRESP, INOCCUR, INREFID&#34;
+                # columns = &#34;*&#34;
+            else:
+                columns = &#34;*&#34;
+            df = pd.read_sql(&#34;SELECT {} FROM &#39;{}&#39;&#34;.format(columns, domain), con)
+            df = df.rename(columns=lambda x: x.strip())
+            return df
+
+        except Exception as e2:
+            print(&#34;Domain could not be loaded from sqlite database&#34;, e2)
+            return
+        finally:
+            print(&#34;Domain {} Loaded&#34;.format(domain))
+            # con.close()
+            gc.collect()
+
+    @staticmethod
+    def read_domain(domain: str, data_folder: str, num_rows: int) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+        Loads a domain from auxiliary generated pickle files for faster Python I/O than with SQL table reads
+
+        :param num_rows: Integer (optional): Number of rows to load from dataframe (default loads all)
+
+        :param domain: String name of domain
+
+        :param data_folder: String, Path to folder containing .pickle files
+
+        :return: pd.DataFrame containing the full domain (all columns and rows)
+        &#34;&#34;&#34;
+        db_file = os.path.join(data_folder, domain)
+        df = pd.read_pickle(f&#34;{db_file}.pickle&#34;)
+
+        if num_rows == -1:
+            return df
+        else:
+            return df[:num_rows]
+
+    def columns(self):
+        &#34;&#34;&#34;
+
+        :return: prints list of columns contained in self.frame
+        &#34;&#34;&#34;
+        print(self.frame.columns.to_list())
+
+    def exclude_columns(self, columns: list):
+        &#34;&#34;&#34;
+        Excludes some columns from the class variable &#39;frame&#39;
+
+        :param columns: Columns to drop from domain
+
+        :return: None (operates on class variable)
+        &#34;&#34;&#34;
+        try:
+            self.frame.drop(labels=columns, axis=1, inplace=True)
+        except KeyError:
+            print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))
+
+    def include_columns(self, columns: list):
+        &#34;&#34;&#34;
+
+        :param columns: (list) Columns to include in dataframe.
+        :return: None (operates on class variable)
+        &#34;&#34;&#34;
+        try:
+            self.frame = self.frame[columns]
+        except KeyError:
+            print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))
+
+    def column_events(self, column: str):
+        try:
+            print(self.frame[column].unique())
+        except KeyError:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def select_variable_from_column(self, column: str, variable: str) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+        Filters and returns a dataframe based off column and variable information, Returns an error if column is not
+        found within the current domain.
+
+        :param variable: String containing variable to be selected from column
+
+        :param column: String containing the column within self.frame to selct variable from
+
+        :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
+        &#34;&#34;&#34;
+        try:
+            df = self.frame[self.frame[column] == variable]
+            if len(df) == 0:
+                print(f&#34;There were no occurences of {variable} within {column}&#34;)
+            return df
+        except KeyError as e:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def table_missingness(self, column=None, variable=None):
+        &#34;&#34;&#34;
+        Print&#39;s a missingness table for either a whole table, or a filtered table where we have selected
+        frame.column == variable
+
+        :param column: (optional) column to search for term variable
+
+        :param variable: (optional) variable to search for
+
+        :return: None
+        &#34;&#34;&#34;
+        if variable is None and column is None:
+            print(f&#34;Total number of rows {len(self.frame)}&#34;)
+            print(self.frame.isna().sum())
+        elif column is None or variable is None:
+            print(&#34;Must specify both a column and a variable&#34;)
+        else:
+            try:
+                trimmed = self.frame[self.frame[column] == variable]
+                print(print(f&#34;Total number of rows {len(trimmed)}&#34;))
+                print(trimmed.isna().sum())
+            except KeyError as e:
+                print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def column_summary(self, column: str, proportions=False, status=False):
+        &#34;&#34;&#34;
+
+        :param column: String, Column name
+
+        :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
+        counts of events in column.
+
+        :return:
+        &#34;&#34;&#34;
+        try:
+            # Loads column as pd.Series
+            filtered = self.frame[column]
+            if status:
+                with pd.option_context(&#39;display.max_rows&#39;, None):
+                    print((self.frame[column] + &#34;__&#34; + self.frame[&#39;status&#39;]).value_counts(normalize=False).sort_index())
+            else:
+                with pd.option_context(&#39;display.max_rows&#39;, None):
+                    print(filtered.value_counts(normalize=proportions))
+        except KeyError as e:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    def __process_occur(self):
+        &#34;&#34;&#34;
+        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe
+
+        :return: None
+        &#34;&#34;&#34;
+
+        if not self.__is_term_outcome:
+            pass
+        else:
+            occur = f&#34;{self.domain}OCCUR&#34;
+            presp = f&#34;{self.domain}PRESP&#34;
+            yes_maps = (self.frame[occur] == &#39;Y&#39;)
+
+            no_maps = self.frame[occur] == &#39;N&#39;
+            yes_maps = (self.frame[occur].isna() &amp; self.frame[presp].isna()) | (self.frame[presp] != &#39;Y&#39;) | (yes_maps)
+            unknown_maps = (self.frame[occur].isna() &amp; (self.frame[presp] == &#34;Y&#34;)) | (self.frame[occur] == &#39;U&#39;)
+
+            conds = [yes_maps, no_maps, unknown_maps]
+            choices = [&#34;Y&#34;, &#34;N&#34;, &#34;U&#34;]
+
+            self.frame[&#34;status&#34;] = np.select(conds, choices, None)
+
+    def free_text_search(self, *term: str) -&gt; pd.DataFrame:
+        &#34;&#34;&#34;
+        Searches for free text entries and returns a filtered dataframe with rows where there is a free text match
+
+        :param term: A string search term or (list). We search for any occurences of this substring e.g. term &#39;hospital&#39; would
+        also return rows with a free text entry matching &#39;hospitalization&#39;. This function is NOT case sensitive
+
+        :return: A filtered df with rows containing &#39;term&#39; in the relevant column of the original domain
+        &#34;&#34;&#34;
+
+        if self.domain not in [&#39;SA&#39;, &#39;IN&#39;, &#39;HO&#39;, &#39;LB&#39;]:
+            print(&#34;Free text search is currently only implemented for SA, IN, or HO domains&#34;)
+            print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
+            return
+
+        domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;:&#34;LBTEST&#34;}
+        search_col = domain_free_text[self.domain]
+        try:
+            search_col_mask = self.frame[search_col].str.contains(&#39;|&#39;.join(term), case=False, na=False)
+            filtered_frame = self.frame[search_col_mask]
+            readable_terms = &#34; or &#34;.join(term)
+            print(f&#34;Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows&#34;)
+        except TypeError:
+            print(&#34;This function requires the &#39;term&#39; argument to be a string&#34;)
+            filtered_frame = None
+        # we probably only want to return some filtered columns here (e.g. derived term, dy, seq, outcoke
+
+        return filtered_frame
+
+    def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
+        &#34;&#34;&#34;
+
+        :param name: (string) Name of domain we are overwriting / saving
+
+        :param data_directory: (string) path to data directory
+
+        :param database_file: (string) name of database file
+
+        :return: True, if write successful
+
+        &#34;&#34;&#34;
+        functions.df_to_sqlite(self.frame, name, data_directory, database_file)</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="pyBasics.domain.Domain.read_domain"><code class="name flex">
+<span>def <span class="ident">read_domain</span></span>(<span>domain: str, data_folder: str, num_rows: int) ‑> pandas.core.frame.DataFrame</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Loads a domain from auxiliary generated pickle files for faster Python I/O than with SQL table reads</p>
+<p>:param num_rows: Integer (optional): Number of rows to load from dataframe (default loads all)</p>
+<p>:param domain: String name of domain</p>
+<p>:param data_folder: String, Path to folder containing .pickle files</p>
+<p>:return: pd.DataFrame containing the full domain (all columns and rows)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def read_domain(domain: str, data_folder: str, num_rows: int) -&gt; pd.DataFrame:
+    &#34;&#34;&#34;
+    Loads a domain from auxiliary generated pickle files for faster Python I/O than with SQL table reads
+
+    :param num_rows: Integer (optional): Number of rows to load from dataframe (default loads all)
+
+    :param domain: String name of domain
+
+    :param data_folder: String, Path to folder containing .pickle files
+
+    :return: pd.DataFrame containing the full domain (all columns and rows)
+    &#34;&#34;&#34;
+    db_file = os.path.join(data_folder, domain)
+    df = pd.read_pickle(f&#34;{db_file}.pickle&#34;)
+
+    if num_rows == -1:
+        return df
+    else:
+        return df[:num_rows]</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="pyBasics.domain.Domain.domain"><code class="name">var <span class="ident">domain</span></code></dt>
+<dd>
+<div class="desc"><p>A string that contains the name of the domain that we have currently loaded.</p></div>
+</dd>
+<dt id="pyBasics.domain.Domain.frame"><code class="name">var <span class="ident">frame</span></code></dt>
+<dd>
+<div class="desc"><p>A Pandas DataFrame which is the data structure where we store the information about this domain.</p></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="pyBasics.domain.Domain.column_events"><code class="name flex">
+<span>def <span class="ident">column_events</span></span>(<span>self, column: str)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def column_events(self, column: str):
+    try:
+        print(self.frame[column].unique())
+    except KeyError:
+        print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.column_summary"><code class="name flex">
+<span>def <span class="ident">column_summary</span></span>(<span>self, column: str, proportions=False, status=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param column: String, Column name</p>
+<p>:param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
+counts of events in column.</p>
+<p>:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def column_summary(self, column: str, proportions=False, status=False):
+    &#34;&#34;&#34;
+
+    :param column: String, Column name
+
+    :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
+    counts of events in column.
+
+    :return:
+    &#34;&#34;&#34;
+    try:
+        # Loads column as pd.Series
+        filtered = self.frame[column]
+        if status:
+            with pd.option_context(&#39;display.max_rows&#39;, None):
+                print((self.frame[column] + &#34;__&#34; + self.frame[&#39;status&#39;]).value_counts(normalize=False).sort_index())
+        else:
+            with pd.option_context(&#39;display.max_rows&#39;, None):
+                print(filtered.value_counts(normalize=proportions))
+    except KeyError as e:
+        print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.columns"><code class="name flex">
+<span>def <span class="ident">columns</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:return: prints list of columns contained in self.frame</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def columns(self):
+    &#34;&#34;&#34;
+
+    :return: prints list of columns contained in self.frame
+    &#34;&#34;&#34;
+    print(self.frame.columns.to_list())</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.exclude_columns"><code class="name flex">
+<span>def <span class="ident">exclude_columns</span></span>(<span>self, columns: list)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Excludes some columns from the class variable 'frame'</p>
+<p>:param columns: Columns to drop from domain</p>
+<p>:return: None (operates on class variable)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exclude_columns(self, columns: list):
+    &#34;&#34;&#34;
+    Excludes some columns from the class variable &#39;frame&#39;
+
+    :param columns: Columns to drop from domain
+
+    :return: None (operates on class variable)
+    &#34;&#34;&#34;
+    try:
+        self.frame.drop(labels=columns, axis=1, inplace=True)
+    except KeyError:
+        print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.free_text_search"><code class="name flex">
+<span>def <span class="ident">free_text_search</span></span>(<span>self, *term: str) ‑> pandas.core.frame.DataFrame</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Searches for free text entries and returns a filtered dataframe with rows where there is a free text match</p>
+<p>:param term: A string search term or (list). We search for any occurences of this substring e.g. term 'hospital' would
+also return rows with a free text entry matching 'hospitalization'. This function is NOT case sensitive</p>
+<p>:return: A filtered df with rows containing 'term' in the relevant column of the original domain</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def free_text_search(self, *term: str) -&gt; pd.DataFrame:
+    &#34;&#34;&#34;
+    Searches for free text entries and returns a filtered dataframe with rows where there is a free text match
+
+    :param term: A string search term or (list). We search for any occurences of this substring e.g. term &#39;hospital&#39; would
+    also return rows with a free text entry matching &#39;hospitalization&#39;. This function is NOT case sensitive
+
+    :return: A filtered df with rows containing &#39;term&#39; in the relevant column of the original domain
+    &#34;&#34;&#34;
+
+    if self.domain not in [&#39;SA&#39;, &#39;IN&#39;, &#39;HO&#39;, &#39;LB&#39;]:
+        print(&#34;Free text search is currently only implemented for SA, IN, or HO domains&#34;)
+        print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
+        return
+
+    domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;:&#34;LBTEST&#34;}
+    search_col = domain_free_text[self.domain]
+    try:
+        search_col_mask = self.frame[search_col].str.contains(&#39;|&#39;.join(term), case=False, na=False)
+        filtered_frame = self.frame[search_col_mask]
+        readable_terms = &#34; or &#34;.join(term)
+        print(f&#34;Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows&#34;)
+    except TypeError:
+        print(&#34;This function requires the &#39;term&#39; argument to be a string&#34;)
+        filtered_frame = None
+    # we probably only want to return some filtered columns here (e.g. derived term, dy, seq, outcoke
+
+    return filtered_frame</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.include_columns"><code class="name flex">
+<span>def <span class="ident">include_columns</span></span>(<span>self, columns: list)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param columns: (list) Columns to include in dataframe.
+:return: None (operates on class variable)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def include_columns(self, columns: list):
+    &#34;&#34;&#34;
+
+    :param columns: (list) Columns to include in dataframe.
+    :return: None (operates on class variable)
+    &#34;&#34;&#34;
+    try:
+        self.frame = self.frame[columns]
+    except KeyError:
+        print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.save_to_sqlite"><code class="name flex">
+<span>def <span class="ident">save_to_sqlite</span></span>(<span>self, name: str, data_directory: str, database_file: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>:param name: (string) Name of domain we are overwriting / saving</p>
+<p>:param data_directory: (string) path to data directory</p>
+<p>:param database_file: (string) name of database file</p>
+<p>:return: True, if write successful</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
+    &#34;&#34;&#34;
+
+    :param name: (string) Name of domain we are overwriting / saving
+
+    :param data_directory: (string) path to data directory
+
+    :param database_file: (string) name of database file
+
+    :return: True, if write successful
+
+    &#34;&#34;&#34;
+    functions.df_to_sqlite(self.frame, name, data_directory, database_file)</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.select_variable_from_column"><code class="name flex">
+<span>def <span class="ident">select_variable_from_column</span></span>(<span>self, column: str, variable: str) ‑> pandas.core.frame.DataFrame</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Filters and returns a dataframe based off column and variable information, Returns an error if column is not
+found within the current domain.</p>
+<p>:param variable: String containing variable to be selected from column</p>
+<p>:param column: String containing the column within self.frame to selct variable from</p>
+<p>:return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select_variable_from_column(self, column: str, variable: str) -&gt; pd.DataFrame:
+    &#34;&#34;&#34;
+    Filters and returns a dataframe based off column and variable information, Returns an error if column is not
+    found within the current domain.
+
+    :param variable: String containing variable to be selected from column
+
+    :param column: String containing the column within self.frame to selct variable from
+
+    :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
+    &#34;&#34;&#34;
+    try:
+        df = self.frame[self.frame[column] == variable]
+        if len(df) == 0:
+            print(f&#34;There were no occurences of {variable} within {column}&#34;)
+        return df
+    except KeyError as e:
+        print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
+</details>
+</dd>
+<dt id="pyBasics.domain.Domain.table_missingness"><code class="name flex">
+<span>def <span class="ident">table_missingness</span></span>(<span>self, column=None, variable=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Print's a missingness table for either a whole table, or a filtered table where we have selected
+frame.column == variable</p>
+<p>:param column: (optional) column to search for term variable</p>
+<p>:param variable: (optional) variable to search for</p>
+<p>:return: None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def table_missingness(self, column=None, variable=None):
+    &#34;&#34;&#34;
+    Print&#39;s a missingness table for either a whole table, or a filtered table where we have selected
+    frame.column == variable
+
+    :param column: (optional) column to search for term variable
+
+    :param variable: (optional) variable to search for
+
+    :return: None
+    &#34;&#34;&#34;
+    if variable is None and column is None:
+        print(f&#34;Total number of rows {len(self.frame)}&#34;)
+        print(self.frame.isna().sum())
+    elif column is None or variable is None:
+        print(&#34;Must specify both a column and a variable&#34;)
+    else:
+        try:
+            trimmed = self.frame[self.frame[column] == variable]
+            print(print(f&#34;Total number of rows {len(trimmed)}&#34;))
+            print(trimmed.isna().sum())
+        except KeyError as e:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="pyBasics" href="index.html">pyBasics</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="pyBasics.domain.Domain" href="#pyBasics.domain.Domain">Domain</a></code></h4>
+<ul class="">
+<li><code><a title="pyBasics.domain.Domain.column_events" href="#pyBasics.domain.Domain.column_events">column_events</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.column_summary" href="#pyBasics.domain.Domain.column_summary">column_summary</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.columns" href="#pyBasics.domain.Domain.columns">columns</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.domain" href="#pyBasics.domain.Domain.domain">domain</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.exclude_columns" href="#pyBasics.domain.Domain.exclude_columns">exclude_columns</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.frame" href="#pyBasics.domain.Domain.frame">frame</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.free_text_search" href="#pyBasics.domain.Domain.free_text_search">free_text_search</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.include_columns" href="#pyBasics.domain.Domain.include_columns">include_columns</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.read_domain" href="#pyBasics.domain.Domain.read_domain">read_domain</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.save_to_sqlite" href="#pyBasics.domain.Domain.save_to_sqlite">save_to_sqlite</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.select_variable_from_column" href="#pyBasics.domain.Domain.select_variable_from_column">select_variable_from_column</a></code></li>
+<li><code><a title="pyBasics.domain.Domain.table_missingness" href="#pyBasics.domain.Domain.table_missingness">table_missingness</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
+</footer>
+</body>
+</html>

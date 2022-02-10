@@ -4,14 +4,11 @@ import sqlite3
 
 import numpy as np
 import pandas as pd
-
-# import ray
-# ray.init()
-# import modin.pandas as pd
+from . import functions
 
 # pd.set_option('display.max_rows', None)
-# pd.set_option('display.max_columns', None)
-pd.options.display.max_rows = 10
+pd.set_option('display.max_columns', None)
+# pd.set_option('display.max_rows', None)
 pd.set_option('display.expand_frame_repr', False)
 
 
@@ -20,12 +17,18 @@ class Domain:
     A generic class that loads a domain and provides basic exploratory data analysis
     """
 
-    def __init__(self, domain: str, data_directory: str):
+    def __init__(self, domain: str, data_directory: str, num_rows = -1):
 
         # Load domain as a dataframe and store as a class field
-        self.frame = self.read_domain(domain, data_directory)
+        self.frame = self.read_domain(domain, data_directory, num_rows)
+        """
+        A Pandas DataFrame which is the data structure where we store the information about this domain. 
+        """
         # Store the name of domain as a class field
         self.domain = domain
+        """
+        A string that contains the name of the domain that we have currently loaded. 
+        """
 
         # We handle term based domains slightly different
         if domain in ['HO', 'SA', 'IN']:
@@ -37,7 +40,7 @@ class Domain:
             self.__is_term_outcome = False
 
     @staticmethod
-    def read_domain_deprecated(domain, data_folder, data_file):
+    def __read_domain_deprecated(domain, data_folder, data_file):
         """
 
         :param domain: Domain to load e.g. DM, SA, IN
@@ -71,16 +74,25 @@ class Domain:
             gc.collect()
 
     @staticmethod
-    def read_domain(domain: str, data_folder: str) -> pd.DataFrame:
+    def read_domain(domain: str, data_folder: str, num_rows: int) -> pd.DataFrame:
         """
         Loads a domain from auxiliary generated pickle files for faster Python I/O than with SQL table reads
+
+        :param num_rows: Integer (optional): Number of rows to load from dataframe (default loads all)
+
         :param domain: String name of domain
+
         :param data_folder: String, Path to folder containing .pickle files
+
         :return: pd.DataFrame containing the full domain (all columns and rows)
         """
         db_file = os.path.join(data_folder, domain)
         df = pd.read_pickle(f"{db_file}.pickle")
-        return df[:100000]
+
+        if num_rows == -1:
+            return df
+        else:
+            return df[:num_rows]
 
     def columns(self):
         """
@@ -89,12 +101,45 @@ class Domain:
         """
         print(self.frame.columns.to_list())
 
-    def select_variable_from_column(self, column, variable):
+    def exclude_columns(self, columns: list):
+        """
+        Excludes some columns from the class variable 'frame'
+
+        :param columns: Columns to drop from domain
+
+        :return: None (operates on class variable)
+        """
+        try:
+            self.frame.drop(labels=columns, axis=1, inplace=True)
+        except KeyError:
+            print(print(f"At leas one column: '{columns}' is not in the current domain: '{self.domain}'"))
+
+    def include_columns(self, columns: list):
+        """
+
+        :param columns: (list) Columns to include in dataframe.
+        :return: None (operates on class variable)
+        """
+        try:
+            self.frame = self.frame[columns]
+        except KeyError:
+            print(print(f"At leas one column: '{columns}' is not in the current domain: '{self.domain}'"))
+
+    def column_events(self, column: str):
+        try:
+            print(self.frame[column].unique())
+        except KeyError:
+            print(f"Column '{column}' is not in the current domain: '{self.domain}'")
+
+    def select_variable_from_column(self, column: str, variable: str) -> pd.DataFrame:
         """
         Filters and returns a dataframe based off column and variable information, Returns an error if column is not
         found within the current domain.
+
         :param variable: String containing variable to be selected from column
+
         :param column: String containing the column within self.frame to selct variable from
+
         :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
         """
         try:
@@ -107,11 +152,14 @@ class Domain:
 
     def table_missingness(self, column=None, variable=None):
         """
-        Print's a missingness table for either a whole table, or a filtered table where we hsve selected
-        frame.column == variabel
-        :param variable:
-        :param column:
-        :return:
+        Print's a missingness table for either a whole table, or a filtered table where we have selected
+        frame.column == variable
+
+        :param column: (optional) column to search for term variable
+
+        :param variable: (optional) variable to search for
+
+        :return: None
         """
         if variable is None and column is None:
             print(f"Total number of rows {len(self.frame)}")
@@ -126,24 +174,38 @@ class Domain:
             except KeyError as e:
                 print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
-    def column_summary(self, column):
+    def column_summary(self, column: str, proportions=False, status=False):
+        """
+
+        :param column: String, Column name
+
+        :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
+        counts of events in column.
+
+        :return:
+        """
         try:
             # Loads column as pd.Series
             filtered = self.frame[column]
-            print(filtered.value_counts())
+            if status:
+                with pd.option_context('display.max_rows', None):
+                    print((self.frame[column] + "__" + self.frame['status']).value_counts(normalize=False).sort_index())
+            else:
+                with pd.option_context('display.max_rows', None):
+                    print(filtered.value_counts(normalize=proportions))
         except KeyError as e:
             print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
     def __process_occur(self):
         """
-        Protected function that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe
+        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe
+
         :return: None
         """
-        print('HERE')
+
         if not self.__is_term_outcome:
             pass
         else:
-            # Need to look at NaN
             occur = f"{self.domain}OCCUR"
             presp = f"{self.domain}PRESP"
             yes_maps = (self.frame[occur] == 'Y')
@@ -157,29 +219,45 @@ class Domain:
 
             self.frame["status"] = np.select(conds, choices, None)
 
-    def free_text_search(self, *term):
+    def free_text_search(self, *term: str) -> pd.DataFrame:
         """
         Searches for free text entries and returns a filtered dataframe with rows where there is a free text match
+
         :param term: A string search term or (list). We search for any occurences of this substring e.g. term 'hospital' would
         also return rows with a free text entry matching 'hospitalization'. This function is NOT case sensitive
+
         :return: A filtered df with rows containing 'term' in the relevant column of the original domain
         """
 
-        if self.domain not in ['SA', 'IN', 'HO']:
+        if self.domain not in ['SA', 'IN', 'HO', 'LB']:
             print("Free text search is currently only implemented for SA, IN, or HO domains")
             print(f"You have currently loaded '{self.domain}'")
             return
 
-        domain_free_text = {"HO": "HOTERM", "IN": "INTRT", "SA": "SATERM"}
+        domain_free_text = {"HO": "HOTERM", "IN": "INTRT", "SA": "SATERM", "LB":"LBTEST"}
         search_col = domain_free_text[self.domain]
         try:
-            search_col_mask = self.frame[search_col].str.contains('|'.join(term), case=False)
+            search_col_mask = self.frame[search_col].str.contains('|'.join(term), case=False, na=False)
             filtered_frame = self.frame[search_col_mask]
             readable_terms = " or ".join(term)
-            print(f"Free text entries containing either {readable_terms} were found in {len(filtered_frame)} rows")
+            print(f"Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows")
         except TypeError:
             print("This function requires the 'term' argument to be a string")
             filtered_frame = None
         # we probably only want to return some filtered columns here (e.g. derived term, dy, seq, outcoke
 
         return filtered_frame
+
+    def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
+        """
+
+        :param name: (string) Name of domain we are overwriting / saving
+
+        :param data_directory: (string) path to data directory
+
+        :param database_file: (string) name of database file
+
+        :return: True, if write successful
+
+        """
+        functions.df_to_sqlite(self.frame, name, data_directory, database_file)
