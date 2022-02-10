@@ -12,7 +12,7 @@ Once you have installed conda it is simple as creating a new virtual environment
 
 Once you have activated your new virtual environment you can then type: 
 		
-		pip install pyisaricbasics
+		pip install pyISARICBasics
 
 You can then access any functionality described in the documentation in any IDE or Jupyter Notebook configured to use this environment. 
 
