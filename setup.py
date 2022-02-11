@@ -38,7 +38,7 @@ setup(
     #
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
-    ### TODO change this
+
     url='https://github.com/KyleYoung1997/pyIsaricBasics',  # Optional
 
     # This should be your name or the name of the organization which owns the
@@ -144,7 +144,7 @@ setup(
     #
     # For example, the following would provide a command called `sample` which
     # executes the function `main` from this package when invoked:
-    # TODO change this to generate databasse
+    # TODO change this to generate databasse - don't need
     # entry_points={  # Optional
     #     'console_scripts': [
     #         'sample=sample:main',

@@ -45,7 +45,7 @@ class Domain:
     A generic class that loads a domain and provides basic exploratory data analysis
     &#34;&#34;&#34;
 
-    def __init__(self, domain: str, data_directory: str, num_rows = -1):
+    def __init__(self, domain: str, data_directory: str, num_rows = None):
 
         # Load domain as a dataframe and store as a class field
         self.frame = self.read_domain(domain, data_directory, num_rows)
@@ -63,7 +63,7 @@ class Domain:
             # Save term based domain information as a protected attribute - we use this behind the scenes
             self.__is_term_outcome = True
             # Process outcome column - this is appended to the end of our class specific frame object
-            self.__process_occur()
+            self.process_occur()
         else:
             self.__is_term_outcome = False
 
@@ -117,7 +117,7 @@ class Domain:
         db_file = os.path.join(data_folder, domain)
         df = pd.read_pickle(f&#34;{db_file}.pickle&#34;)
 
-        if num_rows == -1:
+        if num_rows is None:
             return df
         else:
             return df[:num_rows]
@@ -146,6 +146,7 @@ class Domain:
         &#34;&#34;&#34;
 
         :param columns: (list) Columns to include in dataframe.
+
         :return: None (operates on class variable)
         &#34;&#34;&#34;
         try:
@@ -179,6 +180,7 @@ class Domain:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
     def table_missingness(self, column=None, variable=None):
+
         &#34;&#34;&#34;
         Print&#39;s a missingness table for either a whole table, or a filtered table where we have selected
         frame.column == variable
@@ -190,22 +192,32 @@ class Domain:
         :return: None
         &#34;&#34;&#34;
         if variable is None and column is None:
-            print(f&#34;Total number of rows {len(self.frame)}&#34;)
+            n_unique = self.frame.USUBJID.nunique()
+            print(f&#34;Total number of rows: {len(self.frame)}&#34;)
+            print(f&#34;Total number of unique patients: {n_unique}&#34;)
             print(self.frame.isna().sum())
         elif column is None or variable is None:
-            print(&#34;Must specify both a column and a variable&#34;)
+            print(&#34;Must specify both a column and a variable or neither&#34;)
         else:
             try:
                 trimmed = self.frame[self.frame[column] == variable]
-                print(print(f&#34;Total number of rows {len(trimmed)}&#34;))
+                n_unique = trimmed.USUBJID.nunique()
+                print(f&#34;Total number of rows: {len(trimmed)}&#34;)
+                print(f&#34;Total number of unique patients: {n_unique}&#34;)
                 print(trimmed.isna().sum())
             except KeyError as e:
                 print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def column_summary(self, column: str, proportions=False, status=False):
+    def column_summary(self, column: str,  *variables, proportions=False, status=False,):
         &#34;&#34;&#34;
 
+
+
         :param column: String, Column name
+
+        :param variables: String, optional name of variables to filter by
+
+        :param status: If True, include Y, N or U information from self.frame.status
 
         :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
         counts of events in column.
@@ -214,19 +226,38 @@ class Domain:
         &#34;&#34;&#34;
         try:
             # Loads column as pd.Series
-            filtered = self.frame[column]
+            if len(variables) == 0:
+                filtered = self.frame[column]
+                status_filt = self.frame[&#39;status&#39;]
+            else:
+                filtered = self.frame[column]
+                mask = filtered.isin(variables)
+                filtered = filtered[mask]
+                status_filt = self.frame[&#39;status&#39;][mask]
+
             if status:
                 with pd.option_context(&#39;display.max_rows&#39;, None):
-                    print((self.frame[column] + &#34;__&#34; + self.frame[&#39;status&#39;]).value_counts(normalize=False).sort_index())
+                    print((filtered + &#34;__&#34; + status_filt).value_counts(normalize=False).sort_index())
             else:
                 with pd.option_context(&#39;display.max_rows&#39;, None):
                     print(filtered.value_counts(normalize=proportions))
         except KeyError as e:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def __process_occur(self):
+    def process_occur(self):
         &#34;&#34;&#34;
-        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe
+        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe and
+        maps variables according to the following logic:
+
+
+        | xxPRESP | xxOCCUR | status |
+        |---------|---------|--------|
+        | NA      | NA      | Y      |
+        | NA      | Y       | U      |
+        | N       | Y       | N      |
+        | U       | Y       | U      |
+        | Y       | NA      | Y      |
+        | Y       | Y       | Y      |
 
         :return: None
         &#34;&#34;&#34;
@@ -258,7 +289,7 @@ class Domain:
         &#34;&#34;&#34;
 
         if self.domain not in [&#39;SA&#39;, &#39;IN&#39;, &#39;HO&#39;, &#39;LB&#39;]:
-            print(&#34;Free text search is currently only implemented for SA, IN, or HO domains&#34;)
+            print(&#34;Free text search is currently only implemented for SA, IN, LB or HO domains&#34;)
             print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
             return
 
@@ -302,7 +333,7 @@ class Domain:
 <dl>
 <dt id="pyISARICBasics.domain.Domain"><code class="flex name class">
 <span>class <span class="ident">Domain</span></span>
-<span>(</span><span>domain: str, data_directory: str, num_rows=-1)</span>
+<span>(</span><span>domain: str, data_directory: str, num_rows=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>A generic class that loads a domain and provides basic exploratory data analysis</p></div>
@@ -315,7 +346,7 @@ class Domain:
     A generic class that loads a domain and provides basic exploratory data analysis
     &#34;&#34;&#34;
 
-    def __init__(self, domain: str, data_directory: str, num_rows = -1):
+    def __init__(self, domain: str, data_directory: str, num_rows = None):
 
         # Load domain as a dataframe and store as a class field
         self.frame = self.read_domain(domain, data_directory, num_rows)
@@ -333,7 +364,7 @@ class Domain:
             # Save term based domain information as a protected attribute - we use this behind the scenes
             self.__is_term_outcome = True
             # Process outcome column - this is appended to the end of our class specific frame object
-            self.__process_occur()
+            self.process_occur()
         else:
             self.__is_term_outcome = False
 
@@ -387,7 +418,7 @@ class Domain:
         db_file = os.path.join(data_folder, domain)
         df = pd.read_pickle(f&#34;{db_file}.pickle&#34;)
 
-        if num_rows == -1:
+        if num_rows is None:
             return df
         else:
             return df[:num_rows]
@@ -416,6 +447,7 @@ class Domain:
         &#34;&#34;&#34;
 
         :param columns: (list) Columns to include in dataframe.
+
         :return: None (operates on class variable)
         &#34;&#34;&#34;
         try:
@@ -449,6 +481,7 @@ class Domain:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
     def table_missingness(self, column=None, variable=None):
+
         &#34;&#34;&#34;
         Print&#39;s a missingness table for either a whole table, or a filtered table where we have selected
         frame.column == variable
@@ -460,22 +493,32 @@ class Domain:
         :return: None
         &#34;&#34;&#34;
         if variable is None and column is None:
-            print(f&#34;Total number of rows {len(self.frame)}&#34;)
+            n_unique = self.frame.USUBJID.nunique()
+            print(f&#34;Total number of rows: {len(self.frame)}&#34;)
+            print(f&#34;Total number of unique patients: {n_unique}&#34;)
             print(self.frame.isna().sum())
         elif column is None or variable is None:
-            print(&#34;Must specify both a column and a variable&#34;)
+            print(&#34;Must specify both a column and a variable or neither&#34;)
         else:
             try:
                 trimmed = self.frame[self.frame[column] == variable]
-                print(print(f&#34;Total number of rows {len(trimmed)}&#34;))
+                n_unique = trimmed.USUBJID.nunique()
+                print(f&#34;Total number of rows: {len(trimmed)}&#34;)
+                print(f&#34;Total number of unique patients: {n_unique}&#34;)
                 print(trimmed.isna().sum())
             except KeyError as e:
                 print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def column_summary(self, column: str, proportions=False, status=False):
+    def column_summary(self, column: str,  *variables, proportions=False, status=False,):
         &#34;&#34;&#34;
 
+
+
         :param column: String, Column name
+
+        :param variables: String, optional name of variables to filter by
+
+        :param status: If True, include Y, N or U information from self.frame.status
 
         :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
         counts of events in column.
@@ -484,19 +527,38 @@ class Domain:
         &#34;&#34;&#34;
         try:
             # Loads column as pd.Series
-            filtered = self.frame[column]
+            if len(variables) == 0:
+                filtered = self.frame[column]
+                status_filt = self.frame[&#39;status&#39;]
+            else:
+                filtered = self.frame[column]
+                mask = filtered.isin(variables)
+                filtered = filtered[mask]
+                status_filt = self.frame[&#39;status&#39;][mask]
+
             if status:
                 with pd.option_context(&#39;display.max_rows&#39;, None):
-                    print((self.frame[column] + &#34;__&#34; + self.frame[&#39;status&#39;]).value_counts(normalize=False).sort_index())
+                    print((filtered + &#34;__&#34; + status_filt).value_counts(normalize=False).sort_index())
             else:
                 with pd.option_context(&#39;display.max_rows&#39;, None):
                     print(filtered.value_counts(normalize=proportions))
         except KeyError as e:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def __process_occur(self):
+    def process_occur(self):
         &#34;&#34;&#34;
-        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe
+        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe and
+        maps variables according to the following logic:
+
+
+        | xxPRESP | xxOCCUR | status |
+        |---------|---------|--------|
+        | NA      | NA      | Y      |
+        | NA      | Y       | U      |
+        | N       | Y       | N      |
+        | U       | Y       | U      |
+        | Y       | NA      | Y      |
+        | Y       | Y       | Y      |
 
         :return: None
         &#34;&#34;&#34;
@@ -528,7 +590,7 @@ class Domain:
         &#34;&#34;&#34;
 
         if self.domain not in [&#39;SA&#39;, &#39;IN&#39;, &#39;HO&#39;, &#39;LB&#39;]:
-            print(&#34;Free text search is currently only implemented for SA, IN, or HO domains&#34;)
+            print(&#34;Free text search is currently only implemented for SA, IN, LB or HO domains&#34;)
             print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
             return
 
@@ -591,7 +653,7 @@ def read_domain(domain: str, data_folder: str, num_rows: int) -&gt; pd.DataFrame
     db_file = os.path.join(data_folder, domain)
     df = pd.read_pickle(f&#34;{db_file}.pickle&#34;)
 
-    if num_rows == -1:
+    if num_rows is None:
         return df
     else:
         return df[:num_rows]</code></pre>
@@ -628,10 +690,12 @@ def read_domain(domain: str, data_folder: str, num_rows: int) -&gt; pd.DataFrame
 </details>
 </dd>
 <dt id="pyISARICBasics.domain.Domain.column_summary"><code class="name flex">
-<span>def <span class="ident">column_summary</span></span>(<span>self, column: str, proportions=False, status=False)</span>
+<span>def <span class="ident">column_summary</span></span>(<span>self, column: str, *variables, proportions=False, status=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>:param column: String, Column name</p>
+<p>:param variables: String, optional name of variables to filter by</p>
+<p>:param status: If True, include Y, N or U information from self.frame.status</p>
 <p>:param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
 counts of events in column.</p>
 <p>:return:</p></div>
@@ -639,10 +703,16 @@ counts of events in column.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def column_summary(self, column: str, proportions=False, status=False):
+<pre><code class="python">def column_summary(self, column: str,  *variables, proportions=False, status=False,):
     &#34;&#34;&#34;
 
+
+
     :param column: String, Column name
+
+    :param variables: String, optional name of variables to filter by
+
+    :param status: If True, include Y, N or U information from self.frame.status
 
     :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
     counts of events in column.
@@ -651,10 +721,18 @@ counts of events in column.</p>
     &#34;&#34;&#34;
     try:
         # Loads column as pd.Series
-        filtered = self.frame[column]
+        if len(variables) == 0:
+            filtered = self.frame[column]
+            status_filt = self.frame[&#39;status&#39;]
+        else:
+            filtered = self.frame[column]
+            mask = filtered.isin(variables)
+            filtered = filtered[mask]
+            status_filt = self.frame[&#39;status&#39;][mask]
+
         if status:
             with pd.option_context(&#39;display.max_rows&#39;, None):
-                print((self.frame[column] + &#34;__&#34; + self.frame[&#39;status&#39;]).value_counts(normalize=False).sort_index())
+                print((filtered + &#34;__&#34; + status_filt).value_counts(normalize=False).sort_index())
         else:
             with pd.option_context(&#39;display.max_rows&#39;, None):
                 print(filtered.value_counts(normalize=proportions))
@@ -727,7 +805,7 @@ also return rows with a free text entry matching 'hospitalization'. This functio
     &#34;&#34;&#34;
 
     if self.domain not in [&#39;SA&#39;, &#39;IN&#39;, &#39;HO&#39;, &#39;LB&#39;]:
-        print(&#34;Free text search is currently only implemented for SA, IN, or HO domains&#34;)
+        print(&#34;Free text search is currently only implemented for SA, IN, LB or HO domains&#34;)
         print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
         return
 
@@ -750,8 +828,8 @@ also return rows with a free text entry matching 'hospitalization'. This functio
 <span>def <span class="ident">include_columns</span></span>(<span>self, columns: list)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:param columns: (list) Columns to include in dataframe.
-:return: None (operates on class variable)</p></div>
+<div class="desc"><p>:param columns: (list) Columns to include in dataframe.</p>
+<p>:return: None (operates on class variable)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -760,12 +838,100 @@ also return rows with a free text entry matching 'hospitalization'. This functio
     &#34;&#34;&#34;
 
     :param columns: (list) Columns to include in dataframe.
+
     :return: None (operates on class variable)
     &#34;&#34;&#34;
     try:
         self.frame = self.frame[columns]
     except KeyError:
         print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))</code></pre>
+</details>
+</dd>
+<dt id="pyISARICBasics.domain.Domain.process_occur"><code class="name flex">
+<span>def <span class="ident">process_occur</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe and
+maps variables according to the following logic:</p>
+<table>
+<thead>
+<tr>
+<th>xxPRESP</th>
+<th>xxOCCUR</th>
+<th>status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NA</td>
+<td>NA</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>NA</td>
+<td>Y</td>
+<td>U</td>
+</tr>
+<tr>
+<td>N</td>
+<td>Y</td>
+<td>N</td>
+</tr>
+<tr>
+<td>U</td>
+<td>Y</td>
+<td>U</td>
+</tr>
+<tr>
+<td>Y</td>
+<td>NA</td>
+<td>Y</td>
+</tr>
+<tr>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+</tr>
+</tbody>
+</table>
+<p>:return: None</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_occur(self):
+    &#34;&#34;&#34;
+    Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe and
+    maps variables according to the following logic:
+
+
+    | xxPRESP | xxOCCUR | status |
+    |---------|---------|--------|
+    | NA      | NA      | Y      |
+    | NA      | Y       | U      |
+    | N       | Y       | N      |
+    | U       | Y       | U      |
+    | Y       | NA      | Y      |
+    | Y       | Y       | Y      |
+
+    :return: None
+    &#34;&#34;&#34;
+
+    if not self.__is_term_outcome:
+        pass
+    else:
+        occur = f&#34;{self.domain}OCCUR&#34;
+        presp = f&#34;{self.domain}PRESP&#34;
+        yes_maps = (self.frame[occur] == &#39;Y&#39;)
+
+        no_maps = self.frame[occur] == &#39;N&#39;
+        yes_maps = (self.frame[occur].isna() &amp; self.frame[presp].isna()) | (self.frame[presp] != &#39;Y&#39;) | (yes_maps)
+        unknown_maps = (self.frame[occur].isna() &amp; (self.frame[presp] == &#34;Y&#34;)) | (self.frame[occur] == &#39;U&#39;)
+
+        conds = [yes_maps, no_maps, unknown_maps]
+        choices = [&#34;Y&#34;, &#34;N&#34;, &#34;U&#34;]
+
+        self.frame[&#34;status&#34;] = np.select(conds, choices, None)</code></pre>
 </details>
 </dd>
 <dt id="pyISARICBasics.domain.Domain.save_to_sqlite"><code class="name flex">
@@ -842,6 +1008,7 @@ frame.column == variable</p>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def table_missingness(self, column=None, variable=None):
+
     &#34;&#34;&#34;
     Print&#39;s a missingness table for either a whole table, or a filtered table where we have selected
     frame.column == variable
@@ -853,14 +1020,18 @@ frame.column == variable</p>
     :return: None
     &#34;&#34;&#34;
     if variable is None and column is None:
-        print(f&#34;Total number of rows {len(self.frame)}&#34;)
+        n_unique = self.frame.USUBJID.nunique()
+        print(f&#34;Total number of rows: {len(self.frame)}&#34;)
+        print(f&#34;Total number of unique patients: {n_unique}&#34;)
         print(self.frame.isna().sum())
     elif column is None or variable is None:
-        print(&#34;Must specify both a column and a variable&#34;)
+        print(&#34;Must specify both a column and a variable or neither&#34;)
     else:
         try:
             trimmed = self.frame[self.frame[column] == variable]
-            print(print(f&#34;Total number of rows {len(trimmed)}&#34;))
+            n_unique = trimmed.USUBJID.nunique()
+            print(f&#34;Total number of rows: {len(trimmed)}&#34;)
+            print(f&#34;Total number of unique patients: {n_unique}&#34;)
             print(trimmed.isna().sum())
         except KeyError as e:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
@@ -895,6 +1066,7 @@ frame.column == variable</p>
 <li><code><a title="pyISARICBasics.domain.Domain.frame" href="#pyISARICBasics.domain.Domain.frame">frame</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.free_text_search" href="#pyISARICBasics.domain.Domain.free_text_search">free_text_search</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.include_columns" href="#pyISARICBasics.domain.Domain.include_columns">include_columns</a></code></li>
+<li><code><a title="pyISARICBasics.domain.Domain.process_occur" href="#pyISARICBasics.domain.Domain.process_occur">process_occur</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.read_domain" href="#pyISARICBasics.domain.Domain.read_domain">read_domain</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.save_to_sqlite" href="#pyISARICBasics.domain.Domain.save_to_sqlite">save_to_sqlite</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.select_variable_from_column" href="#pyISARICBasics.domain.Domain.select_variable_from_column">select_variable_from_column</a></code></li>

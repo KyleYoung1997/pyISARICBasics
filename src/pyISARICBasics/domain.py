@@ -17,7 +17,7 @@ class Domain:
     A generic class that loads a domain and provides basic exploratory data analysis
     """
 
-    def __init__(self, domain: str, data_directory: str, num_rows = -1):
+    def __init__(self, domain: str, data_directory: str, num_rows = None):
 
         # Load domain as a dataframe and store as a class field
         self.frame = self.read_domain(domain, data_directory, num_rows)
@@ -35,7 +35,7 @@ class Domain:
             # Save term based domain information as a protected attribute - we use this behind the scenes
             self.__is_term_outcome = True
             # Process outcome column - this is appended to the end of our class specific frame object
-            self.__process_occur()
+            self.process_occur()
         else:
             self.__is_term_outcome = False
 
@@ -89,7 +89,7 @@ class Domain:
         db_file = os.path.join(data_folder, domain)
         df = pd.read_pickle(f"{db_file}.pickle")
 
-        if num_rows == -1:
+        if num_rows is None:
             return df
         else:
             return df[:num_rows]
@@ -118,6 +118,7 @@ class Domain:
         """
 
         :param columns: (list) Columns to include in dataframe.
+
         :return: None (operates on class variable)
         """
         try:
@@ -151,6 +152,7 @@ class Domain:
             print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
     def table_missingness(self, column=None, variable=None):
+
         """
         Print's a missingness table for either a whole table, or a filtered table where we have selected
         frame.column == variable
@@ -162,22 +164,32 @@ class Domain:
         :return: None
         """
         if variable is None and column is None:
-            print(f"Total number of rows {len(self.frame)}")
+            n_unique = self.frame.USUBJID.nunique()
+            print(f"Total number of rows: {len(self.frame)}")
+            print(f"Total number of unique patients: {n_unique}")
             print(self.frame.isna().sum())
         elif column is None or variable is None:
-            print("Must specify both a column and a variable")
+            print("Must specify both a column and a variable or neither")
         else:
             try:
                 trimmed = self.frame[self.frame[column] == variable]
-                print(print(f"Total number of rows {len(trimmed)}"))
+                n_unique = trimmed.USUBJID.nunique()
+                print(f"Total number of rows: {len(trimmed)}")
+                print(f"Total number of unique patients: {n_unique}")
                 print(trimmed.isna().sum())
             except KeyError as e:
                 print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
-    def column_summary(self, column: str, proportions=False, status=False):
+    def column_summary(self, column: str,  *variables, proportions=False, status=False,):
         """
 
+
+
         :param column: String, Column name
+
+        :param variables: String, optional name of variables to filter by
+
+        :param status: If True, include Y, N or U information from self.frame.status
 
         :param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
         counts of events in column.
@@ -186,19 +198,38 @@ class Domain:
         """
         try:
             # Loads column as pd.Series
-            filtered = self.frame[column]
+            if len(variables) == 0:
+                filtered = self.frame[column]
+                status_filt = self.frame['status']
+            else:
+                filtered = self.frame[column]
+                mask = filtered.isin(variables)
+                filtered = filtered[mask]
+                status_filt = self.frame['status'][mask]
+
             if status:
                 with pd.option_context('display.max_rows', None):
-                    print((self.frame[column] + "__" + self.frame['status']).value_counts(normalize=False).sort_index())
+                    print((filtered + "__" + status_filt).value_counts(normalize=False).sort_index())
             else:
                 with pd.option_context('display.max_rows', None):
                     print(filtered.value_counts(normalize=proportions))
         except KeyError as e:
             print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
-    def __process_occur(self):
+    def process_occur(self):
         """
-        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe
+        Protected method that processes the XXOCCUR, XXPRESP into Y, N or U outcomes. Modifies the class dataframe and
+        maps variables according to the following logic:
+
+
+        | xxPRESP | xxOCCUR | status |
+        |---------|---------|--------|
+        | NA      | NA      | Y      |
+        | NA      | Y       | U      |
+        | N       | Y       | N      |
+        | U       | Y       | U      |
+        | Y       | NA      | Y      |
+        | Y       | Y       | Y      |
 
         :return: None
         """
@@ -230,7 +261,7 @@ class Domain:
         """
 
         if self.domain not in ['SA', 'IN', 'HO', 'LB']:
-            print("Free text search is currently only implemented for SA, IN, or HO domains")
+            print("Free text search is currently only implemented for SA, IN, LB or HO domains")
             print(f"You have currently loaded '{self.domain}'")
             return
 
