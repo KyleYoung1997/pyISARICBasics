@@ -8,11 +8,24 @@ The package is in the early stages of development.
 # Install 
 This package can be installed using pip - the package installer for Python. We suggest creating a virtual environment (using conda or otherwise). Miniconda (https://docs.conda.io/en/latest/miniconda.html) is a minimal installer for Anaconda that is suitable for this purpose. 
 
-Once you have installed conda it is simple as creating a new virtual environment (https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). 
+Once you have installed conda you will need to create a new virtual environment (see point 1 of https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). 
+
+Type 
+	conda create -n "your_env_name" python=3.8
+	
+This will create a new conda environment with Python 3.8.
+
+You should then activate your new environment by entering the following command: 
+
+	conda activate "your_env_name" 
+	
+You then need to install pip using the following command: 
+	
+	conda intall pip
 
 Once you have activated your new virtual environment you can then type: 
 		
-		pip install pyISARICBasics
+	pip install pyISARICBasics
 
 You can then access any functionality described in the documentation in any IDE or Jupyter Notebook configured to use this environment. 
 
