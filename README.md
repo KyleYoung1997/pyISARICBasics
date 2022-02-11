@@ -24,7 +24,7 @@ You should then activate your new environment by entering the following command:
 	
 You then need to install pip using the following command: 
 	
-	conda intall pip
+	conda install pip
 
 Once you have activated your new virtual environment you can then type: 
 		
