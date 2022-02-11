@@ -30,7 +30,7 @@ Once you have activated your new virtual environment you can then type:
 		
 	pip install pyISARICBasics
 
-You can then access any pyISARICBasics functionality described in the documentation in any IDE or Jupyter Notebook configured to use this environment. 
+You can then access any pyISARICBasics functionality described in the documentation using IDE or Jupyter Notebook that is configured to use this environment. 
 
 # Documentation 
 
