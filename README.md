@@ -8,10 +8,12 @@ The package is in the early stages of development.
 # Install 
 This package can be installed using pip - the package installer for Python. We suggest creating a virtual environment (using conda or otherwise). Miniconda (https://docs.conda.io/en/latest/miniconda.html) is a minimal installer for Anaconda that is suitable for this purpose. 
 
-Once you have installed conda you will need to create a new virtual environment (see point 1 of https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). 
+Once you have installed conda you will need to create a new virtual environment. The steps are as follows (but see https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html for alternatives). 
 
-Type 
+Type the following into a console window: 
+
 	conda create -n "your_env_name" python=3.8
+	
 	
 This will create a new conda environment with Python 3.8.
 
