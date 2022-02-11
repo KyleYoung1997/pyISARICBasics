@@ -34,7 +34,7 @@ You can then access any pyISARICBasics functionality described in the documentat
 
 # Documentation 
 
-Package documentation is contained at the following link: https://kyleyoung1997.github.io/pyISARICBasics/
+Package documentation is contained at the following link: [go](https://kyleyoung1997.github.io/pyISARICBasics/){:target="_blank" rel="noopener"}
 
 
 # Tutorial 
