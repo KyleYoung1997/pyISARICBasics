@@ -32,8 +32,18 @@ import sqlite3
 import pandas as pd
 import numpy as np
 
+ALL_DOMAINS = {&#34;DM&#34;, &#34;DS&#34;, &#34;ER&#34;, &#34;HO&#34;, &#34;IE&#34;, &#34;IN&#34;, &#34;LB&#34;, &#34;MB&#34;, &#34;RP&#34;, &#34;RS&#34;, &#34;SA&#34;, &#34;SV&#34;, &#34;VS&#34;, &#34;CQ&#34;, &#34;SC&#34;, &#34;PO&#34;}
+&#34;&#34;&#34;
+A set containing all possible domains in the ISARIC dataset. 
+&#34;&#34;&#34;
 
-###TODO write custom .hdf5 loader and saver functions for QUICKEST I/O
+
+### TODO write custom .hdf5 loader and saver functions for QUICKEST I/O
+### This could be tricky -&gt; it seems like the best option is to convert dtypes from object to pandas d types
+### but then we need to handle stuff differently in other places in code...
+### We also need to try and deal with the fact that it seems like df.to_hdf() freaks out with DF&#39;s over a certain size
+### You can load and append using hdf but I am not sure how yet -&gt; you can also query using hdf this is definitely worth
+### looking into though.
 
 def csv_to_sqlite(data_folder, db_file, overwrite=True):
     &#34;&#34;&#34;
@@ -53,12 +63,13 @@ def csv_to_sqlite(data_folder, db_file, overwrite=True):
     for file in os.listdir(data_folder):  # get all files in data_folder
         if file.endswith(&#34;.csv&#34;):  # get csv files
             name = os.path.splitext(file)[0]  # file name with no extension
+            name = parse_domain_names(name)
             name = name.replace(&#39;-&#39;, &#39;_&#39;)  # replace - with _ to avoid sql errors.
             print(&#34;_&#34; * 150)
             print(&#34;Creating table:&#34;, name)
             file_path = os.path.join(data_folder, file)
 
-            df = pd.read_csv(file_path, on_bad_lines=&#39;skip&#39;, verbose = False)
+            df = pd.read_csv(file_path, on_bad_lines=&#39;skip&#39;, verbose=False)
             df = df.rename(columns=lambda x: x.strip())
             # print(df.dtypes)
             # df = df.convert_dtypes()
@@ -68,6 +79,7 @@ def csv_to_sqlite(data_folder, db_file, overwrite=True):
             df_to_sqlite(df, name, data_folder, db_file, overwrite)
             del df
             gc.collect()
+
 
 def df_to_sqlite(df, table_name, data_folder, data_file, overwrite=True):
     &#34;&#34;&#34;
@@ -107,12 +119,35 @@ def df_to_sqlite(df, table_name, data_folder, data_file, overwrite=True):
         print(&#34;Table already exists in database, set Overwrite = True if you wish to overwrite existing table.&#34;)
         return None
     finally:
-        con.close()</code></pre>
+        con.close()
+
+
+def parse_domain_names(name: str) -&gt; str:
+    &#34;&#34;&#34;
+    Function to read domain name and return two letter abbreviation for each domain
+
+    :param name: (str) filename similar to &#34;Partner_DM_2021-09-20.csv&#34;
+
+    :return: (str) Two letter abbreviated domain name e.g. &#34;DM&#34; for above filename
+    &#34;&#34;&#34;
+    domain = [i for i in name.split(&#34;_&#34;) if i in ALL_DOMAINS]
+    if len(domain) &gt; 1:
+        print(&#34;Couldn&#39;t parse domain name from filename returning full path as domain name&#34;)
+        return name
+    else:
+        return domain.pop()</code></pre>
 </details>
 </section>
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="pyISARICBasics.functions.ALL_DOMAINS"><code class="name">var <span class="ident">ALL_DOMAINS</span></code></dt>
+<dd>
+<div class="desc"><p>A set containing all possible domains in the ISARIC dataset.</p></div>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
@@ -148,12 +183,13 @@ def df_to_sqlite(df, table_name, data_folder, data_file, overwrite=True):
     for file in os.listdir(data_folder):  # get all files in data_folder
         if file.endswith(&#34;.csv&#34;):  # get csv files
             name = os.path.splitext(file)[0]  # file name with no extension
+            name = parse_domain_names(name)
             name = name.replace(&#39;-&#39;, &#39;_&#39;)  # replace - with _ to avoid sql errors.
             print(&#34;_&#34; * 150)
             print(&#34;Creating table:&#34;, name)
             file_path = os.path.join(data_folder, file)
 
-            df = pd.read_csv(file_path, on_bad_lines=&#39;skip&#39;, verbose = False)
+            df = pd.read_csv(file_path, on_bad_lines=&#39;skip&#39;, verbose=False)
             df = df.rename(columns=lambda x: x.strip())
             # print(df.dtypes)
             # df = df.convert_dtypes()
@@ -222,6 +258,33 @@ the sql database (these are much quicker to load in to memory using Python and P
         con.close()</code></pre>
 </details>
 </dd>
+<dt id="pyISARICBasics.functions.parse_domain_names"><code class="name flex">
+<span>def <span class="ident">parse_domain_names</span></span>(<span>name: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function to read domain name and return two letter abbreviation for each domain</p>
+<p>:param name: (str) filename similar to "Partner_DM_2021-09-20.csv"</p>
+<p>:return: (str) Two letter abbreviated domain name e.g. "DM" for above filename</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_domain_names(name: str) -&gt; str:
+    &#34;&#34;&#34;
+    Function to read domain name and return two letter abbreviation for each domain
+
+    :param name: (str) filename similar to &#34;Partner_DM_2021-09-20.csv&#34;
+
+    :return: (str) Two letter abbreviated domain name e.g. &#34;DM&#34; for above filename
+    &#34;&#34;&#34;
+    domain = [i for i in name.split(&#34;_&#34;) if i in ALL_DOMAINS]
+    if len(domain) &gt; 1:
+        print(&#34;Couldn&#39;t parse domain name from filename returning full path as domain name&#34;)
+        return name
+    else:
+        return domain.pop()</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -238,10 +301,16 @@ the sql database (these are much quicker to load in to memory using Python and P
 <li><code><a title="pyISARICBasics" href="index.html">pyISARICBasics</a></code></li>
 </ul>
 </li>
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="pyISARICBasics.functions.ALL_DOMAINS" href="#pyISARICBasics.functions.ALL_DOMAINS">ALL_DOMAINS</a></code></li>
+</ul>
+</li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="pyISARICBasics.functions.csv_to_sqlite" href="#pyISARICBasics.functions.csv_to_sqlite">csv_to_sqlite</a></code></li>
 <li><code><a title="pyISARICBasics.functions.df_to_sqlite" href="#pyISARICBasics.functions.df_to_sqlite">df_to_sqlite</a></code></li>
+<li><code><a title="pyISARICBasics.functions.parse_domain_names" href="#pyISARICBasics.functions.parse_domain_names">parse_domain_names</a></code></li>
 </ul>
 </li>
 </ul>

@@ -4,8 +4,18 @@ import sqlite3
 import pandas as pd
 import numpy as np
 
+ALL_DOMAINS = {"DM", "DS", "ER", "HO", "IE", "IN", "LB", "MB", "RP", "RS", "SA", "SV", "VS", "CQ", "SC", "PO"}
+"""
+A set containing all possible domains in the ISARIC dataset. 
+"""
 
-###TODO write custom .hdf5 loader and saver functions for QUICKEST I/O
+
+### TODO write custom .hdf5 loader and saver functions for QUICKEST I/O
+### This could be tricky -> it seems like the best option is to convert dtypes from object to pandas d types
+### but then we need to handle stuff differently in other places in code...
+### We also need to try and deal with the fact that it seems like df.to_hdf() freaks out with DF's over a certain size
+### You can load and append using hdf but I am not sure how yet -> you can also query using hdf this is definitely worth
+### looking into though.
 
 def csv_to_sqlite(data_folder, db_file, overwrite=True):
     """
@@ -25,12 +35,13 @@ def csv_to_sqlite(data_folder, db_file, overwrite=True):
     for file in os.listdir(data_folder):  # get all files in data_folder
         if file.endswith(".csv"):  # get csv files
             name = os.path.splitext(file)[0]  # file name with no extension
+            name = parse_domain_names(name)
             name = name.replace('-', '_')  # replace - with _ to avoid sql errors.
             print("_" * 150)
             print("Creating table:", name)
             file_path = os.path.join(data_folder, file)
 
-            df = pd.read_csv(file_path, on_bad_lines='skip', verbose = False)
+            df = pd.read_csv(file_path, on_bad_lines='skip', verbose=False)
             df = df.rename(columns=lambda x: x.strip())
             # print(df.dtypes)
             # df = df.convert_dtypes()
@@ -40,6 +51,7 @@ def csv_to_sqlite(data_folder, db_file, overwrite=True):
             df_to_sqlite(df, name, data_folder, db_file, overwrite)
             del df
             gc.collect()
+
 
 def df_to_sqlite(df, table_name, data_folder, data_file, overwrite=True):
     """
@@ -82,7 +94,17 @@ def df_to_sqlite(df, table_name, data_folder, data_file, overwrite=True):
         con.close()
 
 
+def parse_domain_names(name: str) -> str:
+    """
+    Function to read domain name and return two letter abbreviation for each domain
 
+    :param name: (str) filename similar to "Partner_DM_2021-09-20.csv"
 
-
-
+    :return: (str) Two letter abbreviated domain name e.g. "DM" for above filename
+    """
+    domain = [i for i in name.split("_") if i in ALL_DOMAINS]
+    if len(domain) > 1:
+        print("Couldn't parse domain name from filename returning full path as domain name")
+        return name
+    else:
+        return domain.pop()
