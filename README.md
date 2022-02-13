@@ -26,11 +26,15 @@ You then need to install pip using the following command:
 	
 	conda install pip
 
-Once you have activated your new virtual environment you can then type: 
+You can then type the following command to install the package: 
 		
 	pip install pyISARICBasics
 
 You can then access any pyISARICBasics functionality described in the documentation using IDE or Jupyter Notebook that is configured to use this environment. 
+
+While the package is in early development we suggest regularly checking for updates with the following command:
+
+	pip install pyISARICBasics --upgrade
 
 # Documentation 
 
@@ -41,8 +45,6 @@ Package documentation is contained at the following link: https://kyleyoung1997.
 Once you have created a virtual environment to access the tutorial you can download the .ipynb file from this repo. 
 
 Create a folder that contains this notebook and another folder containing the raw ISARIC data. 
-
-For ease of use we suggest renaming the individual .csv's to only contain their domain names. E.g. "SA.csv" for the SA domain or "IN.csv" for the IN domain. 
 
 You then need to navigate to your newly created folder and activate your virtual environment. Then type the following command to open jupyter notebook: 
 
