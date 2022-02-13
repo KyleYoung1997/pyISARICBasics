@@ -46,7 +46,13 @@ Once you have created a virtual environment to access the tutorial you can downl
 
 Create a folder that contains this notebook and another folder containing the raw ISARIC data. 
 
-You then need to navigate to your newly created folder and activate your virtual environment. Then type the following command to open jupyter notebook: 
+You then need to navigate to your newly created folder and activate your virtual environment. To do this you need to open a console window and use the following command: 
+
+	cd "path_to_directory" 
+	
+(If you're using a mac you can type cd and then drag the folder icon of your newly created folder into the terminal window to get the path) 
+
+Then type the following command to open jupyter notebook: 
 
 		jupyter notebook
 		
