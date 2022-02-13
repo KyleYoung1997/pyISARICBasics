@@ -54,7 +54,7 @@ You then need to navigate to your newly created folder and activate your virtual
 
 Then type the following command to open jupyter notebook: 
 
-		jupyter notebook
+	jupyter notebook
 		
 Which will launch an interactive browser window. You can then open the tutorial notebook. 
 
