@@ -4,7 +4,7 @@ import sqlite3
 import pandas as pd
 import numpy as np
 
-ALL_DOMAINS = {"DM", "DS", "ER", "HO", "IE", "IN", "LB", "MB", "RP", "RS", "SA", "SV", "VS", "CQ", "SC", "PO"}
+ALL_DOMAINS = {"DM", "DS", "ER", "HO", "IE", "IN", "LB", "MB", "RP", "RS", "SA", "SV", "VS", "CQ", "SC", "PO", "TI"}
 """
 A set containing all possible domains in the ISARIC dataset. 
 """
@@ -35,6 +35,7 @@ def csv_to_sqlite(data_folder, db_file, overwrite=True):
     for file in os.listdir(data_folder):  # get all files in data_folder
         if file.endswith(".csv"):  # get csv files
             name = os.path.splitext(file)[0]  # file name with no extension
+            print(name)
             name = parse_domain_names(name)
             name = name.replace('-', '_')  # replace - with _ to avoid sql errors.
             print("_" * 150)
