@@ -2,7 +2,7 @@
 
 This package is intended to be a gentle introduction to the ISARIC dataset with the goal of helping researchers access and become familiar with the ISARIC dataset. 
 
-The package is in the early stages of development. 
+The package is in the early stages of development and feature requests are welcomed as are new contributors. If you would like to contribute please make contact! 
 
 
 # Install 
