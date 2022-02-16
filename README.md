@@ -2,7 +2,7 @@
 
 This package is intended to be a gentle introduction to the ISARIC dataset with the goal of helping researchers access and become familiar with the ISARIC dataset. 
 
-The package is in the early stages of development. 
+The package is in the early stages of development and feature requests are welcomed as are new contributors. If you would like to contribute please make contact! 
 
 
 # Install 
@@ -26,11 +26,15 @@ You then need to install pip using the following command:
 	
 	conda install pip
 
-Once you have activated your new virtual environment you can then type: 
+You can then type the following command to install the package: 
 		
 	pip install pyISARICBasics
 
 You can then access any pyISARICBasics functionality described in the documentation using IDE or Jupyter Notebook that is configured to use this environment. 
+
+While the package is in early development we suggest regularly checking for updates with the following command:
+
+	pip install pyISARICBasics --upgrade
 
 # Documentation 
 
@@ -42,11 +46,15 @@ Once you have created a virtual environment to access the tutorial you can downl
 
 Create a folder that contains this notebook and another folder containing the raw ISARIC data. 
 
-For ease of use we suggest renaming the individual .csv's to only contain their domain names. E.g. "SA.csv" for the SA domain or "IN.csv" for the IN domain. 
+You then need to navigate to your newly created folder and activate your virtual environment. To do this you need to open a console window and use the following command: 
 
-You then need to navigate to your newly created folder and activate your virtual environment. Then type the following command to open jupyter notebook: 
+	cd "path_to_directory" 
+	
+(If you're using a mac you can type cd and then drag the folder icon of your newly created folder into the terminal window to get the path) 
 
-		jupyter notebook
+Then type the following command to open jupyter notebook: 
+
+	jupyter notebook
 		
 Which will launch an interactive browser window. You can then open the tutorial notebook. 
 
