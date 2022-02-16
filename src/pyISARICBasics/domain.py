@@ -17,7 +17,7 @@ class Domain:
     A generic class that loads a domain and provides basic exploratory data analysis
     """
 
-    def __init__(self, domain: str, data_directory: str, num_rows = None):
+    def __init__(self, domain: str, data_directory: str, num_rows=None):
 
         # Load domain as a dataframe and store as a class field
         self.frame = self.read_domain(domain, data_directory, num_rows)
@@ -180,7 +180,7 @@ class Domain:
             except KeyError as e:
                 print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
-    def column_summary(self, column: str,  *variables, proportions=False, status=False,):
+    def column_summary(self, column: str, *variables, proportions=False, status=False, ):
         """
 
 
@@ -196,25 +196,46 @@ class Domain:
 
         :return:
         """
-        try:
-            # Loads column as pd.Series
-            if len(variables) == 0:
-                filtered = self.frame[column]
-                status_filt = self.frame['status']
-            else:
-                filtered = self.frame[column]
-                mask = filtered.isin(variables)
-                filtered = filtered[mask]
-                status_filt = self.frame['status'][mask]
+        print(f"Number of unique patients is: {self.frame.USUBJID.nunique()}")
+        if self.__is_term_outcome:
+            try:
+                # Loads column as pd.Series
+                if len(variables) == 0:
+                    filtered = self.frame[column]
+                    status_filt = self.frame['status']
+                else:
+                    filtered = self.frame[column]
+                    mask = filtered.isin(variables)
+                    filtered = filtered[mask]
+                    status_filt = self.frame['status'][mask]
 
+                if status:
+                    with pd.option_context('display.max_rows', None):
+                        print((filtered + "__" + status_filt).value_counts(normalize=False).sort_index())
+                else:
+                    with pd.option_context('display.max_rows', None):
+                        print(filtered.value_counts(normalize=proportions))
+            except KeyError as e:
+                print(f"Column '{column}' is not in the current domain: '{self.domain}'")
+
+        else:
             if status:
-                with pd.option_context('display.max_rows', None):
-                    print((filtered + "__" + status_filt).value_counts(normalize=False).sort_index())
-            else:
+                print(f"{self.domain} is not term based -> status won't be calculated")
+            try:
+                if len(variables) == 0:
+                    filtered = self.frame[column]
+
+                else:
+                    filtered = self.frame[column]
+                    mask = filtered.isin(variables)
+                    filtered = filtered[mask]
+
                 with pd.option_context('display.max_rows', None):
                     print(filtered.value_counts(normalize=proportions))
-        except KeyError as e:
-            print(f"Column '{column}' is not in the current domain: '{self.domain}'")
+
+            except KeyError as e:
+                print(f"Column '{column}' is not in the current domain: '{self.domain}'")
+
 
     def process_occur(self):
         """
@@ -265,19 +286,22 @@ class Domain:
             print(f"You have currently loaded '{self.domain}'")
             return
 
-        domain_free_text = {"HO": "HOTERM", "IN": "INTRT", "SA": "SATERM", "LB":"LBTEST"}
+        domain_free_text = {"HO": "HOTERM", "IN": "INTRT", "SA": "SATERM", "LB": "LBTEST"}
         search_col = domain_free_text[self.domain]
         try:
             search_col_mask = self.frame[search_col].str.contains('|'.join(term), case=False, na=False)
             filtered_frame = self.frame[search_col_mask]
             readable_terms = " or ".join(term)
-            print(f"Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows")
+            print(f"Free text entries containing any of '{readable_terms}' were found in {len(filtered_frame)} rows")
         except TypeError:
             print("This function requires the 'term' argument to be a string")
             filtered_frame = None
         # we probably only want to return some filtered columns here (e.g. derived term, dy, seq, outcoke
 
         return filtered_frame
+
+    def filter_on_usubjid(self, usubjids: list):
+        self.frame = self.frame[self.frame.USUBJID.isin(usubjids)]
 
     def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
         """
