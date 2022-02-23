@@ -32,7 +32,7 @@ import sqlite3
 import pandas as pd
 import numpy as np
 
-ALL_DOMAINS = {&#34;DM&#34;, &#34;DS&#34;, &#34;ER&#34;, &#34;HO&#34;, &#34;IE&#34;, &#34;IN&#34;, &#34;LB&#34;, &#34;MB&#34;, &#34;RP&#34;, &#34;RS&#34;, &#34;SA&#34;, &#34;SV&#34;, &#34;VS&#34;, &#34;CQ&#34;, &#34;SC&#34;, &#34;PO&#34;}
+ALL_DOMAINS = {&#34;DM&#34;, &#34;DS&#34;, &#34;ER&#34;, &#34;HO&#34;, &#34;IE&#34;, &#34;IN&#34;, &#34;LB&#34;, &#34;MB&#34;, &#34;RP&#34;, &#34;RS&#34;, &#34;SA&#34;, &#34;SV&#34;, &#34;VS&#34;, &#34;CQ&#34;, &#34;SC&#34;, &#34;PO&#34;, &#34;TI&#34;}
 &#34;&#34;&#34;
 A set containing all possible domains in the ISARIC dataset. 
 &#34;&#34;&#34;
@@ -63,6 +63,7 @@ def csv_to_sqlite(data_folder, db_file, overwrite=True):
     for file in os.listdir(data_folder):  # get all files in data_folder
         if file.endswith(&#34;.csv&#34;):  # get csv files
             name = os.path.splitext(file)[0]  # file name with no extension
+            print(name)
             name = parse_domain_names(name)
             name = name.replace(&#39;-&#39;, &#39;_&#39;)  # replace - with _ to avoid sql errors.
             print(&#34;_&#34; * 150)
@@ -183,6 +184,7 @@ def parse_domain_names(name: str) -&gt; str:
     for file in os.listdir(data_folder):  # get all files in data_folder
         if file.endswith(&#34;.csv&#34;):  # get csv files
             name = os.path.splitext(file)[0]  # file name with no extension
+            print(name)
             name = parse_domain_names(name)
             name = name.replace(&#39;-&#39;, &#39;_&#39;)  # replace - with _ to avoid sql errors.
             print(&#34;_&#34; * 150)

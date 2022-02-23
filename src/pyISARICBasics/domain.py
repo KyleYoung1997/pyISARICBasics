@@ -1,7 +1,8 @@
 import gc
 import os
 import sqlite3
-
+# modify = frame.groupby("SAMODIFY")['USUBJID'].apply(pd.unique).apply(len)
+# modify = frame.groupby("SAMODIFY")['USUBJID'].apply(pd.unique)
 import numpy as np
 import pandas as pd
 from . import functions
@@ -132,22 +133,27 @@ class Domain:
         except KeyError:
             print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
-    def select_variable_from_column(self, column: str, variable: str) -> pd.DataFrame:
+    def select_variables_from_column(self, column: str, *variables: str) -> pd.DataFrame:
         """
         Filters and returns a dataframe based off column and variable information, Returns an error if column is not
         found within the current domain.
 
-        :param variable: String containing variable to be selected from column
+        :param variable: String (or Strings) containing variables to be selected from column
 
         :param column: String containing the column within self.frame to selct variable from
 
         :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
         """
         try:
-            df = self.frame[self.frame[column] == variable]
-            if len(df) == 0:
-                print(f"There were no occurences of {variable} within {column}")
-            return df
+
+            mask = self.frame[column].isin(variables)
+            filtered = self.frame[mask]
+
+            # df = self.frame[self.frame[column] == variable]
+            if len(filtered) == 0:
+                print(f"There were no occurences of {variables} within {column}")
+            print(f"There is {filtered.USUBJID.nunique()} unique patients in filtered dataframe")
+            return filtered
         except KeyError as e:
             print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
@@ -182,7 +188,7 @@ class Domain:
 
     def column_summary(self, column: str, *variables, proportions=False, status=False, ):
         """
-
+        Summarises and returns column information
 
 
         :param column: String, Column name
@@ -196,25 +202,34 @@ class Domain:
 
         :return:
         """
-        print(f"Number of unique patients is: {self.frame.USUBJID.nunique()}")
+        print(f"Number of unique patients in domain: {self.frame.USUBJID.nunique()}")
+        unique_ids = self.frame.groupby(column)['USUBJID'].apply(pd.unique).apply(len).rename("Unique Patients")
         if self.__is_term_outcome:
             try:
                 # Loads column as pd.Series
                 if len(variables) == 0:
-                    filtered = self.frame[column]
-                    status_filt = self.frame['status']
+                    filtered = self.frame
+
                 else:
-                    filtered = self.frame[column]
-                    mask = filtered.isin(variables)
-                    filtered = filtered[mask]
-                    status_filt = self.frame['status'][mask]
+                    # filtered = self.frame[column]
+                    mask = self.frame[column].isin(variables)
+                    filtered = self.frame[mask]
 
                 if status:
                     with pd.option_context('display.max_rows', None):
-                        print((filtered + "__" + status_filt).value_counts(normalize=False).sort_index())
+                        test = filtered.groupby([column, "status"]).size().rename("Number of rows")
+                        unique_ids = filtered.groupby([column, "status"])['USUBJID'].apply(pd.unique).apply(
+                            len).rename("Unique patients")
+                        print(pd.concat((test, unique_ids), axis = 1))
+
                 else:
                     with pd.option_context('display.max_rows', None):
-                        print(filtered.value_counts(normalize=proportions))
+                        if proportions:
+                            rename = "Proportion"
+                        else:
+                            rename = "Number of Rows"
+                        test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                        print(pd.concat((test, unique_ids), axis = 1, join = 'inner'))
             except KeyError as e:
                 print(f"Column '{column}' is not in the current domain: '{self.domain}'")
 
@@ -223,15 +238,19 @@ class Domain:
                 print(f"{self.domain} is not term based -> status won't be calculated")
             try:
                 if len(variables) == 0:
-                    filtered = self.frame[column]
+                    filtered = self.frame
 
                 else:
-                    filtered = self.frame[column]
-                    mask = filtered.isin(variables)
-                    filtered = filtered[mask]
+                    mask = self.frame[column].isin(variables)
+                    filtered = self.frame[mask]
 
                 with pd.option_context('display.max_rows', None):
-                    print(filtered.value_counts(normalize=proportions))
+                    if proportions:
+                        rename = "Proportion"
+                    else:
+                        rename = "Number of Rows"
+                    test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                    print(pd.concat((test, unique_ids), axis = 1, join = 'inner'))
 
             except KeyError as e:
                 print(f"Column '{column}' is not in the current domain: '{self.domain}'")
@@ -301,10 +320,18 @@ class Domain:
         return filtered_frame
 
     def filter_on_usubjid(self, usubjids: list):
+        """
+        Modifies self.frame and includes only those rows that have a USUBJID in usubjids []
+
+        :param usubjids:
+
+        :return:
+        """
         self.frame = self.frame[self.frame.USUBJID.isin(usubjids)]
 
     def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
         """
+        Save current and potentially modified domain.
 
         :param name: (string) Name of domain we are overwriting / saving
 

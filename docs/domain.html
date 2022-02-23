@@ -29,7 +29,8 @@
 <pre><code class="python">import gc
 import os
 import sqlite3
-
+# modify = frame.groupby(&#34;SAMODIFY&#34;)[&#39;USUBJID&#39;].apply(pd.unique).apply(len)
+# modify = frame.groupby(&#34;SAMODIFY&#34;)[&#39;USUBJID&#39;].apply(pd.unique)
 import numpy as np
 import pandas as pd
 from . import functions
@@ -45,7 +46,7 @@ class Domain:
     A generic class that loads a domain and provides basic exploratory data analysis
     &#34;&#34;&#34;
 
-    def __init__(self, domain: str, data_directory: str, num_rows = None):
+    def __init__(self, domain: str, data_directory: str, num_rows=None):
 
         # Load domain as a dataframe and store as a class field
         self.frame = self.read_domain(domain, data_directory, num_rows)
@@ -160,22 +161,27 @@ class Domain:
         except KeyError:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def select_variable_from_column(self, column: str, variable: str) -&gt; pd.DataFrame:
+    def select_variables_from_column(self, column: str, *variables: str) -&gt; pd.DataFrame:
         &#34;&#34;&#34;
         Filters and returns a dataframe based off column and variable information, Returns an error if column is not
         found within the current domain.
 
-        :param variable: String containing variable to be selected from column
+        :param variable: String (or Strings) containing variables to be selected from column
 
         :param column: String containing the column within self.frame to selct variable from
 
         :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
         &#34;&#34;&#34;
         try:
-            df = self.frame[self.frame[column] == variable]
-            if len(df) == 0:
-                print(f&#34;There were no occurences of {variable} within {column}&#34;)
-            return df
+
+            mask = self.frame[column].isin(variables)
+            filtered = self.frame[mask]
+
+            # df = self.frame[self.frame[column] == variable]
+            if len(filtered) == 0:
+                print(f&#34;There were no occurences of {variables} within {column}&#34;)
+            print(f&#34;There is {filtered.USUBJID.nunique()} unique patients in filtered dataframe&#34;)
+            return filtered
         except KeyError as e:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
@@ -208,9 +214,9 @@ class Domain:
             except KeyError as e:
                 print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def column_summary(self, column: str,  *variables, proportions=False, status=False,):
+    def column_summary(self, column: str, *variables, proportions=False, status=False, ):
         &#34;&#34;&#34;
-
+        Summarises and returns column information
 
 
         :param column: String, Column name
@@ -224,25 +230,59 @@ class Domain:
 
         :return:
         &#34;&#34;&#34;
-        try:
-            # Loads column as pd.Series
-            if len(variables) == 0:
-                filtered = self.frame[column]
-                status_filt = self.frame[&#39;status&#39;]
-            else:
-                filtered = self.frame[column]
-                mask = filtered.isin(variables)
-                filtered = filtered[mask]
-                status_filt = self.frame[&#39;status&#39;][mask]
+        print(f&#34;Number of unique patients in domain: {self.frame.USUBJID.nunique()}&#34;)
+        unique_ids = self.frame.groupby(column)[&#39;USUBJID&#39;].apply(pd.unique).apply(len).rename(&#34;Unique Patients&#34;)
+        if self.__is_term_outcome:
+            try:
+                # Loads column as pd.Series
+                if len(variables) == 0:
+                    filtered = self.frame
 
+                else:
+                    # filtered = self.frame[column]
+                    mask = self.frame[column].isin(variables)
+                    filtered = self.frame[mask]
+
+                if status:
+                    with pd.option_context(&#39;display.max_rows&#39;, None):
+                        test = filtered.groupby([column, &#34;status&#34;]).size().rename(&#34;Number of rows&#34;)
+                        unique_ids = filtered.groupby([column, &#34;status&#34;])[&#39;USUBJID&#39;].apply(pd.unique).apply(
+                            len).rename(&#34;Unique patients&#34;)
+                        print(pd.concat((test, unique_ids), axis = 1))
+
+                else:
+                    with pd.option_context(&#39;display.max_rows&#39;, None):
+                        if proportions:
+                            rename = &#34;Proportion&#34;
+                        else:
+                            rename = &#34;Number of Rows&#34;
+                        test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                        print(pd.concat((test, unique_ids), axis = 1, join = &#39;inner&#39;))
+            except KeyError as e:
+                print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+        else:
             if status:
+                print(f&#34;{self.domain} is not term based -&gt; status won&#39;t be calculated&#34;)
+            try:
+                if len(variables) == 0:
+                    filtered = self.frame
+
+                else:
+                    mask = self.frame[column].isin(variables)
+                    filtered = self.frame[mask]
+
                 with pd.option_context(&#39;display.max_rows&#39;, None):
-                    print((filtered + &#34;__&#34; + status_filt).value_counts(normalize=False).sort_index())
-            else:
-                with pd.option_context(&#39;display.max_rows&#39;, None):
-                    print(filtered.value_counts(normalize=proportions))
-        except KeyError as e:
-            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+                    if proportions:
+                        rename = &#34;Proportion&#34;
+                    else:
+                        rename = &#34;Number of Rows&#34;
+                    test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                    print(pd.concat((test, unique_ids), axis = 1, join = &#39;inner&#39;))
+
+            except KeyError as e:
+                print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
 
     def process_occur(self):
         &#34;&#34;&#34;
@@ -293,13 +333,13 @@ class Domain:
             print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
             return
 
-        domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;:&#34;LBTEST&#34;}
+        domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;: &#34;LBTEST&#34;}
         search_col = domain_free_text[self.domain]
         try:
             search_col_mask = self.frame[search_col].str.contains(&#39;|&#39;.join(term), case=False, na=False)
             filtered_frame = self.frame[search_col_mask]
             readable_terms = &#34; or &#34;.join(term)
-            print(f&#34;Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows&#34;)
+            print(f&#34;Free text entries containing any of &#39;{readable_terms}&#39; were found in {len(filtered_frame)} rows&#34;)
         except TypeError:
             print(&#34;This function requires the &#39;term&#39; argument to be a string&#34;)
             filtered_frame = None
@@ -307,8 +347,19 @@ class Domain:
 
         return filtered_frame
 
+    def filter_on_usubjid(self, usubjids: list):
+        &#34;&#34;&#34;
+        Modifies self.frame and includes only those rows that have a USUBJID in usubjids []
+
+        :param usubjids:
+
+        :return:
+        &#34;&#34;&#34;
+        self.frame = self.frame[self.frame.USUBJID.isin(usubjids)]
+
     def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
         &#34;&#34;&#34;
+        Save current and potentially modified domain. 
 
         :param name: (string) Name of domain we are overwriting / saving
 
@@ -346,7 +397,7 @@ class Domain:
     A generic class that loads a domain and provides basic exploratory data analysis
     &#34;&#34;&#34;
 
-    def __init__(self, domain: str, data_directory: str, num_rows = None):
+    def __init__(self, domain: str, data_directory: str, num_rows=None):
 
         # Load domain as a dataframe and store as a class field
         self.frame = self.read_domain(domain, data_directory, num_rows)
@@ -461,22 +512,27 @@ class Domain:
         except KeyError:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def select_variable_from_column(self, column: str, variable: str) -&gt; pd.DataFrame:
+    def select_variables_from_column(self, column: str, *variables: str) -&gt; pd.DataFrame:
         &#34;&#34;&#34;
         Filters and returns a dataframe based off column and variable information, Returns an error if column is not
         found within the current domain.
 
-        :param variable: String containing variable to be selected from column
+        :param variable: String (or Strings) containing variables to be selected from column
 
         :param column: String containing the column within self.frame to selct variable from
 
         :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
         &#34;&#34;&#34;
         try:
-            df = self.frame[self.frame[column] == variable]
-            if len(df) == 0:
-                print(f&#34;There were no occurences of {variable} within {column}&#34;)
-            return df
+
+            mask = self.frame[column].isin(variables)
+            filtered = self.frame[mask]
+
+            # df = self.frame[self.frame[column] == variable]
+            if len(filtered) == 0:
+                print(f&#34;There were no occurences of {variables} within {column}&#34;)
+            print(f&#34;There is {filtered.USUBJID.nunique()} unique patients in filtered dataframe&#34;)
+            return filtered
         except KeyError as e:
             print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
@@ -509,9 +565,9 @@ class Domain:
             except KeyError as e:
                 print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
 
-    def column_summary(self, column: str,  *variables, proportions=False, status=False,):
+    def column_summary(self, column: str, *variables, proportions=False, status=False, ):
         &#34;&#34;&#34;
-
+        Summarises and returns column information
 
 
         :param column: String, Column name
@@ -525,25 +581,59 @@ class Domain:
 
         :return:
         &#34;&#34;&#34;
-        try:
-            # Loads column as pd.Series
-            if len(variables) == 0:
-                filtered = self.frame[column]
-                status_filt = self.frame[&#39;status&#39;]
-            else:
-                filtered = self.frame[column]
-                mask = filtered.isin(variables)
-                filtered = filtered[mask]
-                status_filt = self.frame[&#39;status&#39;][mask]
+        print(f&#34;Number of unique patients in domain: {self.frame.USUBJID.nunique()}&#34;)
+        unique_ids = self.frame.groupby(column)[&#39;USUBJID&#39;].apply(pd.unique).apply(len).rename(&#34;Unique Patients&#34;)
+        if self.__is_term_outcome:
+            try:
+                # Loads column as pd.Series
+                if len(variables) == 0:
+                    filtered = self.frame
 
+                else:
+                    # filtered = self.frame[column]
+                    mask = self.frame[column].isin(variables)
+                    filtered = self.frame[mask]
+
+                if status:
+                    with pd.option_context(&#39;display.max_rows&#39;, None):
+                        test = filtered.groupby([column, &#34;status&#34;]).size().rename(&#34;Number of rows&#34;)
+                        unique_ids = filtered.groupby([column, &#34;status&#34;])[&#39;USUBJID&#39;].apply(pd.unique).apply(
+                            len).rename(&#34;Unique patients&#34;)
+                        print(pd.concat((test, unique_ids), axis = 1))
+
+                else:
+                    with pd.option_context(&#39;display.max_rows&#39;, None):
+                        if proportions:
+                            rename = &#34;Proportion&#34;
+                        else:
+                            rename = &#34;Number of Rows&#34;
+                        test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                        print(pd.concat((test, unique_ids), axis = 1, join = &#39;inner&#39;))
+            except KeyError as e:
+                print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+        else:
             if status:
+                print(f&#34;{self.domain} is not term based -&gt; status won&#39;t be calculated&#34;)
+            try:
+                if len(variables) == 0:
+                    filtered = self.frame
+
+                else:
+                    mask = self.frame[column].isin(variables)
+                    filtered = self.frame[mask]
+
                 with pd.option_context(&#39;display.max_rows&#39;, None):
-                    print((filtered + &#34;__&#34; + status_filt).value_counts(normalize=False).sort_index())
-            else:
-                with pd.option_context(&#39;display.max_rows&#39;, None):
-                    print(filtered.value_counts(normalize=proportions))
-        except KeyError as e:
-            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+                    if proportions:
+                        rename = &#34;Proportion&#34;
+                    else:
+                        rename = &#34;Number of Rows&#34;
+                    test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                    print(pd.concat((test, unique_ids), axis = 1, join = &#39;inner&#39;))
+
+            except KeyError as e:
+                print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
 
     def process_occur(self):
         &#34;&#34;&#34;
@@ -594,13 +684,13 @@ class Domain:
             print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
             return
 
-        domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;:&#34;LBTEST&#34;}
+        domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;: &#34;LBTEST&#34;}
         search_col = domain_free_text[self.domain]
         try:
             search_col_mask = self.frame[search_col].str.contains(&#39;|&#39;.join(term), case=False, na=False)
             filtered_frame = self.frame[search_col_mask]
             readable_terms = &#34; or &#34;.join(term)
-            print(f&#34;Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows&#34;)
+            print(f&#34;Free text entries containing any of &#39;{readable_terms}&#39; were found in {len(filtered_frame)} rows&#34;)
         except TypeError:
             print(&#34;This function requires the &#39;term&#39; argument to be a string&#34;)
             filtered_frame = None
@@ -608,8 +698,19 @@ class Domain:
 
         return filtered_frame
 
+    def filter_on_usubjid(self, usubjids: list):
+        &#34;&#34;&#34;
+        Modifies self.frame and includes only those rows that have a USUBJID in usubjids []
+
+        :param usubjids:
+
+        :return:
+        &#34;&#34;&#34;
+        self.frame = self.frame[self.frame.USUBJID.isin(usubjids)]
+
     def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
         &#34;&#34;&#34;
+        Save current and potentially modified domain. 
 
         :param name: (string) Name of domain we are overwriting / saving
 
@@ -693,7 +794,8 @@ def read_domain(domain: str, data_folder: str, num_rows: int) -&gt; pd.DataFrame
 <span>def <span class="ident">column_summary</span></span>(<span>self, column: str, *variables, proportions=False, status=False)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:param column: String, Column name</p>
+<div class="desc"><p>Summarises and returns column information</p>
+<p>:param column: String, Column name</p>
 <p>:param variables: String, optional name of variables to filter by</p>
 <p>:param status: If True, include Y, N or U information from self.frame.status</p>
 <p>:param proportions: Boolean: If True print normalised proportions for items in column, by default: False returns
@@ -703,9 +805,9 @@ counts of events in column.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def column_summary(self, column: str,  *variables, proportions=False, status=False,):
+<pre><code class="python">def column_summary(self, column: str, *variables, proportions=False, status=False, ):
     &#34;&#34;&#34;
-
+    Summarises and returns column information
 
 
     :param column: String, Column name
@@ -719,25 +821,58 @@ counts of events in column.</p>
 
     :return:
     &#34;&#34;&#34;
-    try:
-        # Loads column as pd.Series
-        if len(variables) == 0:
-            filtered = self.frame[column]
-            status_filt = self.frame[&#39;status&#39;]
-        else:
-            filtered = self.frame[column]
-            mask = filtered.isin(variables)
-            filtered = filtered[mask]
-            status_filt = self.frame[&#39;status&#39;][mask]
+    print(f&#34;Number of unique patients in domain: {self.frame.USUBJID.nunique()}&#34;)
+    unique_ids = self.frame.groupby(column)[&#39;USUBJID&#39;].apply(pd.unique).apply(len).rename(&#34;Unique Patients&#34;)
+    if self.__is_term_outcome:
+        try:
+            # Loads column as pd.Series
+            if len(variables) == 0:
+                filtered = self.frame
 
+            else:
+                # filtered = self.frame[column]
+                mask = self.frame[column].isin(variables)
+                filtered = self.frame[mask]
+
+            if status:
+                with pd.option_context(&#39;display.max_rows&#39;, None):
+                    test = filtered.groupby([column, &#34;status&#34;]).size().rename(&#34;Number of rows&#34;)
+                    unique_ids = filtered.groupby([column, &#34;status&#34;])[&#39;USUBJID&#39;].apply(pd.unique).apply(
+                        len).rename(&#34;Unique patients&#34;)
+                    print(pd.concat((test, unique_ids), axis = 1))
+
+            else:
+                with pd.option_context(&#39;display.max_rows&#39;, None):
+                    if proportions:
+                        rename = &#34;Proportion&#34;
+                    else:
+                        rename = &#34;Number of Rows&#34;
+                    test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                    print(pd.concat((test, unique_ids), axis = 1, join = &#39;inner&#39;))
+        except KeyError as e:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)
+
+    else:
         if status:
+            print(f&#34;{self.domain} is not term based -&gt; status won&#39;t be calculated&#34;)
+        try:
+            if len(variables) == 0:
+                filtered = self.frame
+
+            else:
+                mask = self.frame[column].isin(variables)
+                filtered = self.frame[mask]
+
             with pd.option_context(&#39;display.max_rows&#39;, None):
-                print((filtered + &#34;__&#34; + status_filt).value_counts(normalize=False).sort_index())
-        else:
-            with pd.option_context(&#39;display.max_rows&#39;, None):
-                print(filtered.value_counts(normalize=proportions))
-    except KeyError as e:
-        print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
+                if proportions:
+                    rename = &#34;Proportion&#34;
+                else:
+                    rename = &#34;Number of Rows&#34;
+                test = filtered[column].value_counts(normalize=proportions).rename(rename)
+                print(pd.concat((test, unique_ids), axis = 1, join = &#39;inner&#39;))
+
+        except KeyError as e:
+            print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
 </details>
 </dd>
 <dt id="pyISARICBasics.domain.Domain.columns"><code class="name flex">
@@ -782,6 +917,28 @@ counts of events in column.</p>
         print(print(f&#34;At leas one column: &#39;{columns}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;))</code></pre>
 </details>
 </dd>
+<dt id="pyISARICBasics.domain.Domain.filter_on_usubjid"><code class="name flex">
+<span>def <span class="ident">filter_on_usubjid</span></span>(<span>self, usubjids: list)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Modifies self.frame and includes only those rows that have a USUBJID in usubjids []</p>
+<p>:param usubjids:</p>
+<p>:return:</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter_on_usubjid(self, usubjids: list):
+    &#34;&#34;&#34;
+    Modifies self.frame and includes only those rows that have a USUBJID in usubjids []
+
+    :param usubjids:
+
+    :return:
+    &#34;&#34;&#34;
+    self.frame = self.frame[self.frame.USUBJID.isin(usubjids)]</code></pre>
+</details>
+</dd>
 <dt id="pyISARICBasics.domain.Domain.free_text_search"><code class="name flex">
 <span>def <span class="ident">free_text_search</span></span>(<span>self, *term: str) ‑> pandas.core.frame.DataFrame</span>
 </code></dt>
@@ -809,13 +966,13 @@ also return rows with a free text entry matching 'hospitalization'. This functio
         print(f&#34;You have currently loaded &#39;{self.domain}&#39;&#34;)
         return
 
-    domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;:&#34;LBTEST&#34;}
+    domain_free_text = {&#34;HO&#34;: &#34;HOTERM&#34;, &#34;IN&#34;: &#34;INTRT&#34;, &#34;SA&#34;: &#34;SATERM&#34;, &#34;LB&#34;: &#34;LBTEST&#34;}
     search_col = domain_free_text[self.domain]
     try:
         search_col_mask = self.frame[search_col].str.contains(&#39;|&#39;.join(term), case=False, na=False)
         filtered_frame = self.frame[search_col_mask]
         readable_terms = &#34; or &#34;.join(term)
-        print(f&#34;Free text entries containing any of {readable_terms} were found in {len(filtered_frame)} rows&#34;)
+        print(f&#34;Free text entries containing any of &#39;{readable_terms}&#39; were found in {len(filtered_frame)} rows&#34;)
     except TypeError:
         print(&#34;This function requires the &#39;term&#39; argument to be a string&#34;)
         filtered_frame = None
@@ -938,7 +1095,8 @@ maps variables according to the following logic:</p>
 <span>def <span class="ident">save_to_sqlite</span></span>(<span>self, name: str, data_directory: str, database_file: str)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>:param name: (string) Name of domain we are overwriting / saving</p>
+<div class="desc"><p>Save current and potentially modified domain. </p>
+<p>:param name: (string) Name of domain we are overwriting / saving</p>
 <p>:param data_directory: (string) path to data directory</p>
 <p>:param database_file: (string) name of database file</p>
 <p>:return: True, if write successful</p></div>
@@ -948,6 +1106,7 @@ maps variables according to the following logic:</p>
 </summary>
 <pre><code class="python">def save_to_sqlite(self, name: str, data_directory: str, database_file: str):
     &#34;&#34;&#34;
+    Save current and potentially modified domain. 
 
     :param name: (string) Name of domain we are overwriting / saving
 
@@ -961,35 +1120,40 @@ maps variables according to the following logic:</p>
     functions.df_to_sqlite(self.frame, name, data_directory, database_file)</code></pre>
 </details>
 </dd>
-<dt id="pyISARICBasics.domain.Domain.select_variable_from_column"><code class="name flex">
-<span>def <span class="ident">select_variable_from_column</span></span>(<span>self, column: str, variable: str) ‑> pandas.core.frame.DataFrame</span>
+<dt id="pyISARICBasics.domain.Domain.select_variables_from_column"><code class="name flex">
+<span>def <span class="ident">select_variables_from_column</span></span>(<span>self, column: str, *variables: str) ‑> pandas.core.frame.DataFrame</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Filters and returns a dataframe based off column and variable information, Returns an error if column is not
 found within the current domain.</p>
-<p>:param variable: String containing variable to be selected from column</p>
+<p>:param variable: String (or Strings) containing variables to be selected from column</p>
 <p>:param column: String containing the column within self.frame to selct variable from</p>
 <p>:return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def select_variable_from_column(self, column: str, variable: str) -&gt; pd.DataFrame:
+<pre><code class="python">def select_variables_from_column(self, column: str, *variables: str) -&gt; pd.DataFrame:
     &#34;&#34;&#34;
     Filters and returns a dataframe based off column and variable information, Returns an error if column is not
     found within the current domain.
 
-    :param variable: String containing variable to be selected from column
+    :param variable: String (or Strings) containing variables to be selected from column
 
     :param column: String containing the column within self.frame to selct variable from
 
     :return: Filtered dataframe containing only entries where self.frame[column] contains the value of variable
     &#34;&#34;&#34;
     try:
-        df = self.frame[self.frame[column] == variable]
-        if len(df) == 0:
-            print(f&#34;There were no occurences of {variable} within {column}&#34;)
-        return df
+
+        mask = self.frame[column].isin(variables)
+        filtered = self.frame[mask]
+
+        # df = self.frame[self.frame[column] == variable]
+        if len(filtered) == 0:
+            print(f&#34;There were no occurences of {variables} within {column}&#34;)
+        print(f&#34;There is {filtered.USUBJID.nunique()} unique patients in filtered dataframe&#34;)
+        return filtered
     except KeyError as e:
         print(f&#34;Column &#39;{column}&#39; is not in the current domain: &#39;{self.domain}&#39;&#34;)</code></pre>
 </details>
@@ -1063,13 +1227,14 @@ frame.column == variable</p>
 <li><code><a title="pyISARICBasics.domain.Domain.columns" href="#pyISARICBasics.domain.Domain.columns">columns</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.domain" href="#pyISARICBasics.domain.Domain.domain">domain</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.exclude_columns" href="#pyISARICBasics.domain.Domain.exclude_columns">exclude_columns</a></code></li>
+<li><code><a title="pyISARICBasics.domain.Domain.filter_on_usubjid" href="#pyISARICBasics.domain.Domain.filter_on_usubjid">filter_on_usubjid</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.frame" href="#pyISARICBasics.domain.Domain.frame">frame</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.free_text_search" href="#pyISARICBasics.domain.Domain.free_text_search">free_text_search</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.include_columns" href="#pyISARICBasics.domain.Domain.include_columns">include_columns</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.process_occur" href="#pyISARICBasics.domain.Domain.process_occur">process_occur</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.read_domain" href="#pyISARICBasics.domain.Domain.read_domain">read_domain</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.save_to_sqlite" href="#pyISARICBasics.domain.Domain.save_to_sqlite">save_to_sqlite</a></code></li>
-<li><code><a title="pyISARICBasics.domain.Domain.select_variable_from_column" href="#pyISARICBasics.domain.Domain.select_variable_from_column">select_variable_from_column</a></code></li>
+<li><code><a title="pyISARICBasics.domain.Domain.select_variables_from_column" href="#pyISARICBasics.domain.Domain.select_variables_from_column">select_variables_from_column</a></code></li>
 <li><code><a title="pyISARICBasics.domain.Domain.table_missingness" href="#pyISARICBasics.domain.Domain.table_missingness">table_missingness</a></code></li>
 </ul>
 </li>

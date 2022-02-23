@@ -21,7 +21,7 @@ setup(
     name='pyISARICBasics',  # Required
 
 
-    version='1.0.2',  # Required
+    version='1.0.4',  # Required
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
