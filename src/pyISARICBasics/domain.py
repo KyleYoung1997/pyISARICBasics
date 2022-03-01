@@ -13,11 +13,16 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.expand_frame_repr', False)
 
 
+
+
+
 class Domain:
     """
     A generic class that loads a domain and provides basic exploratory data analysis
     """
-
+    # TODO add function to return list of current USUBJID
+    # TODO change to use sqlite as backend / for calculations (will save memory etc) still use dataframes for return
+    # and presentation
     def __init__(self, domain: str, data_directory: str, num_rows=None):
 
         # Load domain as a dataframe and store as a class field

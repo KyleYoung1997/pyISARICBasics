@@ -49,6 +49,8 @@ def csv_to_sqlite(data_folder, db_file, overwrite=True):
             #
             # print(df.dtypes)
             print("Length of df ", name, len(df))
+            ####TODO process_occur here
+
             df_to_sqlite(df, name, data_folder, db_file, overwrite)
             del df
             gc.collect()
